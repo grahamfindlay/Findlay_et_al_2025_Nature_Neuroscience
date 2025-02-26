@@ -1,0 +1,29 @@
+[project]
+name = "findlay2025a"
+version = "0.1.0"
+authors = [
+  { name="Graham Findlay", email="gfindlay@wisc.edu" }
+]
+description = "Code for `Hippocampal sharp wave sleep: a unifying view of sleep in the hippocampus`."
+readme = "README.md"
+requires-python = ">=3.12.7, <4.0"
+dependencies = [
+    "ecephys[load-sorting]",
+    "msalign>=0.2.0",
+    "pactools>=0.3.1",
+    "ripple-detection>=1.5.1",
+    "wisc-ecephys-tools",
+]
+
+[dependency-groups]
+dev = [
+    "ruff"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv.sources]
+ecephys = { git = "https://github.com/CSC-UW/ecephys.git", branch = "develop", extra = "load-sorting" }
+wisc-ecephys-tools = { git = "https://github.com/CSC-UW/wisc-ecephys-tools.git", branch = "main" }

@@ -1,0 +1,45 @@
+---
+title: 'Wake vs. NREM ripple frequency (Supplementary Table 1)'
+output: pdf_document
+---
+\pagenumbering{gobble}
+```{r, include=FALSE}
+library(arrow)
+library(lme4)
+library(multcomp)
+library(here)
+source(here("analysis", "seahorse.R"))
+
+dat <- sh$load_ripple_frequency_data()
+models <- sh$fit_nested_models(
+  dat, "Ripple Frequency", "state", "experiment", "subject"
+)
+
+novelty_matrix <-
+  rbind("Wake - NREM" = c(0, -1, 0, 0, 0, 0))
+locomotion_matrix <-
+  rbind("Wake - NREM" = c(0, -1, 0, -1, 0, 0))
+dual_matrix <-
+  rbind("Wake - NREM" = c(0, -1, 0, 0, 0, -1))
+
+interaction <- sh$test_interaction_with_experiment(
+  dat, models, novelty_matrix, locomotion_matrix, dual_matrix
+)
+sig_interaction <- interaction$pval < sh$alpha
+
+assert_that(sig_interaction, msg = "Interaction is not significant")
+interaction_effect_size_msg <- paste(
+  "Cohen's local f^2 analogue for interaction:",
+  format(round(interaction$effect_size$fsquared, 3), nsmall = 3)
+)
+nod_msg <- sh$format_posthoc_summary(interaction$posthoc$nod)
+cow_msg <- sh$format_posthoc_summary(interaction$posthoc$cow)
+ctn_msg <- sh$format_posthoc_summary(interaction$posthoc$ctn)
+```
+```{r}
+print(interaction$anova) # Test for interaction between state and experiment.
+print(interaction_effect_size_msg)
+cat(nod_msg, sep = "\n") # Post-hoc tests for Novelty.
+cat(cow_msg, sep = "\n") # Post-hoc tests for Locomotion.
+cat(ctn_msg, sep = "\n") # Post-hoc tests for Dual.
+```

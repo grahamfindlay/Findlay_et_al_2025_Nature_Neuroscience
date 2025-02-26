@@ -1,0 +1,18 @@
+```{r}
+library(rmarkdown)
+library(yaml)
+library(here)
+
+todo <- yaml::read_yaml(here("analysis", "homeostasis.yml"))
+
+for (i in seq_along(todo)) {
+  opts <- todo[[i]]
+  rmarkdown::render(
+    input = here("analysis", "homeostasis_template.Rmd"),
+    output_dir = here("analysis", "output"),
+    output_file = gsub(" ", "_", opts$title),
+    output_format = "pdf_document",
+    params = opts
+  )
+}
+```

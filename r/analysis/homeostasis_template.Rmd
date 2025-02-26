@@ -1,0 +1,68 @@
+---
+params:
+  title: "Cortical SWA homeostasis"
+  figure: "Fig. 2D"
+  response_variable: "Cortical SWA"
+title: "`r params$title` (`r params$figure`)"
+---
+\pagenumbering{gobble}
+```{r, include=FALSE, eval=FALSE}
+# For debugging only. Will not run when knit. 
+params <- list()
+params$response_variable <- "Cortical SWA"
+```
+```{r, include=FALSE}
+library(here)
+source(here("analysis", "seahorse.R"))
+
+result <- sh$test_homeostasis(params$response_variable)
+
+# Check model fit and assumptions
+plot(result$models$full) # Plot model fit
+qqnorm(residuals(result$models$full)) # QQ plot of residuals
+qqline(residuals(result$models$full)) # Add QQ line
+
+sig_interaction <- result$interaction$pval < sh$alpha
+ns_interaction <- !sig_interaction
+sig_main_effect <-
+  !sig_interaction && (result$main_effect$pval < sh$alpha)
+
+if (sig_interaction) {
+  interaction_effect_size_msg <- paste(
+    "Cohen's local f^2 analogue for interaction:",
+    format(round(result$interaction$effect_size$fsquared, 3), nsmall = 3)
+  )
+  nod_msg <- sh$format_posthoc_summary(result$interaction$posthoc$nod)
+  cow_msg <- sh$format_posthoc_summary(result$interaction$posthoc$cow)
+  ctn_msg <- sh$format_posthoc_summary(result$interaction$posthoc$ctn)
+}
+
+if (sig_main_effect) {
+  main_effect_effect_size_msg <- paste(
+    "Cohen's local f^2 analogue for main effect:",
+    format(round(result$main_effect$effect_size$fsquared, 3), nsmall = 3)
+  )
+  pst_msg <- sh$format_posthoc_summary(result$main_effect$posthoc)
+}
+```
+```{r}
+# Test for interaction between condition and experiment.
+print(result$interaction$anova)
+```
+```{r, eval=sig_interaction, include=sig_interaction}
+print(interaction_effect_size_msg)
+cat(nod_msg, sep = "\n") # Post-hoc tests for Novelty.
+cat(cow_msg, sep = "\n") # Post-hoc tests for Locomotion.
+cat(ctn_msg, sep = "\n") # Post-hoc tests for Dual.
+```
+```{r, eval=ns_interaction, include=ns_interaction}
+# Test for main effect of condition.
+print(result$main_effect$anova)
+```
+```{r, eval=sig_main_effect, include=sig_main_effect}
+print(main_effect_effect_size_msg)
+cat(pst_msg, sep = "\n") # Post-hoc tests in the absence of interaction.
+```
+
+
+
