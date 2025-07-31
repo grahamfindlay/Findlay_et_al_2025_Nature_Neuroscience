@@ -1,0 +1,39 @@
+- title: Cortical SWA homeostasis (Fig. 2D)
+  fstem: Fig2D
+  response_variable: Cortical.SWA
+- title: SPW rate homeostasis (Fig. 2E)
+  fstem: Fig2E1
+  response_variable: SPW.Rate
+- title: SPW amplitude homeostasis (Fig. 2E)
+  fstem: Fig2E2
+  response_variable: SPW.Amplitude
+- title: SPW duration homeostasis (Fig. 2E)
+  fstem: Fig2E3
+  response_variable: SPW.Duration
+- title: Ripple rate homeostasis (Fig. 2F)
+  fstem: Fig2F1
+  response_variable: Ripple.Rate
+- title: Ripple amplitude homeostasis (Fig. 2F)
+  fstem: Fig2F2
+  response_variable: Ripple.Amplitude
+- title: Ripple duration homeostasis (Fig. 2F)
+  fstem: Fig2F3
+  response_variable: Ripple.Duration
+- title: Ripple frequency homeostasis (Fig. 2F)
+  fstem: Fig2F4
+  response_variable: Ripple.Frequency
+- title: DS rate homeostasis (Fig. 3E)
+  fstem: Fig3E1
+  response_variable: DSPK.Rate
+- title: DS amplitude homeostasis (Fig. 3E)
+  fstem: Fig3E2
+  response_variable: DSPK.Amplitude
+- title: EMG analysis (Extended Data Fig. 4A)
+  fstem: ExtFig4A
+  response_variable: EMG
+- title: Hippocampal theta homeostasis (Extended Data Fig. 4B)
+  fstem: ExtFig4B
+  response_variable: Hippocampal.Theta
+- title: Hippocampal theta-delta ratio analysis (Extended Data Fig. 4C)
+  fstem: ExtFig4C
+  response_variable: Hippocampal.ThetaDeltaRatio

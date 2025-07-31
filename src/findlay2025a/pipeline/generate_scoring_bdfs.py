@@ -1,6 +1,5 @@
 from ecephys import wne
 from ecephys.wne.sglx.pipeline import generate_scoring_bdfs
-
 from findlay2025a import core
 
 

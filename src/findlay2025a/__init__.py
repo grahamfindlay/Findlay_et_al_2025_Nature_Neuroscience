@@ -8,6 +8,8 @@ from . import (
     plotting,
     ripples,
     sharp_waves,
+    spindles,
+    units,
 )
 
 __all__ = [
@@ -20,4 +22,6 @@ __all__ = [
     "plotting",
     "ripples",
     "sharp_waves",
+    "spindles",
+    "units",
 ]

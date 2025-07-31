@@ -17,10 +17,6 @@ def do_project():
         .sum(numeric_only=True)
         .add_prefix("hipp_total_")
     )
-    contrasts = agg.get_contrasts(c_means)
 
     c_means.to_parquet(nb.get_project_file(Files.HIPPOCAMPAL_BANDPOWER_MEANS))
     c_sums.to_parquet(nb.get_project_file(Files.HIPPOCAMPAL_BANDPOWER_SUM))
-    contrasts.to_parquet(
-        nb.get_project_file(Files.HIPPOCAMPAL_BANDPOWER_CONTRASTS)
-    )  # TODO: Remove, never used.

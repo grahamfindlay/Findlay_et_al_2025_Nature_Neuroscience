@@ -1,0 +1,95 @@
+- title: "Early recovery NREM cortical SWA vs. extended wake theta-delta ratio (Fig. 2G)"
+  fstem: Fig2G
+  x_condition: "EXT.Wake"
+  x_variable: "Total.Hippocampal.ThetaDeltaRatio"
+  y_condition: "Early.REC.NREM"
+  y_variable: "Cortical.SWA"
+- title: "Early recovery NREM SPW rate vs. extended wake theta-delta ratio (Fig. 2H)"
+  fstem: Fig2H1
+  x_condition: "EXT.Wake"
+  x_variable: "Total.Hippocampal.ThetaDeltaRatio"
+  y_condition: "Early.REC.NREM"
+  y_variable: "SPW.Rate"
+- title: "Early recovery NREM SPW amplitude vs. extended wake theta-delta ratio (Fig. 2H)"
+  fstem: Fig2H2
+  x_condition: "EXT.Wake"
+  x_variable: "Total.Hippocampal.ThetaDeltaRatio"
+  y_condition: "Early.REC.NREM"
+  y_variable: "SPW.Amplitude"
+- title: "Early recovery NREM ripple rate vs. extended wake theta-delta ratio (Fig. 2I)"
+  fstem: Fig2I1
+  x_condition: "EXT.Wake"
+  x_variable: "Total.Hippocampal.ThetaDeltaRatio"
+  y_condition: "Early.REC.NREM"
+  y_variable: "Ripple.Rate"
+- title: "Early recovery NREM ripple frequency vs. extended wake theta-delta ratio (Fig. 2I)"
+  fstem: Fig2I2
+  x_condition: "EXT.Wake"
+  x_variable: "Total.Hippocampal.ThetaDeltaRatio"
+  y_condition: "Early.REC.NREM"
+  y_variable: "Ripple.Frequency"
+- title: "Early recovery NREM DS rate vs. extended wake theta-delta ratio (Fig. 3F)"
+  fstem: Fig3F1
+  x_condition: "EXT.Wake"
+  x_variable: "Total.Hippocampal.ThetaDeltaRatio"
+  y_condition: "Early.REC.NREM"
+  y_variable: "DSPK.Rate"
+- title: "Early recovery NREM DS amplitude vs. extended wake theta-delta ratio (Fig. 3F)"
+  fstem: Fig3F2
+  x_condition: "EXT.Wake"
+  x_variable: "Total.Hippocampal.ThetaDeltaRatio"
+  y_condition: "Early.REC.NREM"
+  y_variable: "DSPK.Amplitude"
+- title: "Early recovery NREM SPW rate vs. extended wake SPW rate(Fig. 5A)"
+  fstem: Fig5A1
+  x_condition: "EXT.Wake"
+  x_variable: "SPW.Rate"
+  y_condition: "Early.REC.NREM"
+  y_variable: "SPW.Rate"
+- title: "Early recovery NREM SPW amplitude vs. extended wake SPW amplitude (Fig. 5A)"
+  fstem: Fig5A2
+  x_condition: "EXT.Wake"
+  x_variable: "SPW.Amplitude"
+  y_condition: "Early.REC.NREM"
+  y_variable: "SPW.Amplitude"
+- title: "Early recovery NREM ripple rate vs. extended wake ripple rate (Fig. 5A)"
+  fstem: Fig5A3
+  x_condition: "EXT.Wake"
+  x_variable: "Ripple.Rate"
+  y_condition: "Early.REC.NREM"
+  y_variable: "Ripple.Rate"
+- title: "Early recovery NREM ripple frequency vs. extended wake ripple frequency (Fig. 5A)"
+  fstem: Fig5A4
+  x_condition: "EXT.Wake"
+  x_variable: "Ripple.Frequency"
+  y_condition: "Early.REC.NREM"
+  y_variable: "Ripple.Frequency"
+- title: "Early recovery NREM DS rate vs. extended wake DS rate (Fig. 5A)"
+  fstem: Fig5A5
+  x_condition: "EXT.Wake"
+  x_variable: "DSPK.Rate"
+  y_condition: "Early.REC.NREM"
+  y_variable: "DSPK.Rate"
+- title: "Early recovery NREM DS amplitude vs. extended wake DS amplitude (Fig. 5A)"
+  fstem: Fig5A6
+  x_condition: "EXT.Wake"
+  x_variable: "DSPK.Amplitude"
+  y_condition: "Early.REC.NREM"
+  y_variable: "DSPK.Amplitude"
+- title: "Extended wake theta-delta ratio vs. extended wake theta (Extended Data Fig. 4D)"
+  fstem: ExtFig4D1
+  x_condition: "EXT.Wake"
+  x_variable: "Total.Hippocampal.Theta"
+  y_condition: "EXT.Wake"
+  y_variable: "Total.Hippocampal.ThetaDeltaRatio"
+- title: "Extended wake theta-delta ratio vs. extended wake EMG (Extended Data Fig. 4D)"
+  fstem: ExtFig4D2
+  x_condition: "EXT.Wake"
+  x_variable: "Total.EMG"
+  y_condition: "EXT.Wake"
+  y_variable: "Total.Hippocampal.ThetaDeltaRatio"
+
+
+
+
+

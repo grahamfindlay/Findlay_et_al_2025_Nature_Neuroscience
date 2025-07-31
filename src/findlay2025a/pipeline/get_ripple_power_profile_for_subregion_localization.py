@@ -1,12 +1,10 @@
 from ecephys import utils, wne
-
-from findlay2025a import core
+from findlay2025a import core, hypnograms
 from findlay2025a.constants import Files
 
 
 def do_experiment(sglx_subject: wne.sglx.SGLXSubject, experiment: str):
     nb = core.get_project("seahorse")
-    s3 = core.get_project("shared")
     lfp = core.open_lfps(sglx_subject.name, experiment)
     lfp = core.select_hippocampal_channels(experiment, sglx_subject.name, lfp)
 
@@ -15,7 +13,9 @@ def do_experiment(sglx_subject: wne.sglx.SGLXSubject, experiment: str):
     lfp = lfp.sel(time=slice(t1, t2))
 
     # Drop artifacts
-    hg = s3.load_float_hypnogram(experiment, sglx_subject.name, simplify=True)
+    hg = hypnograms.load_consolidated_hypnogram(
+        experiment, sglx_subject.name, simplify=True, clean=True
+    )
     artifacts = core.load_artifacts(experiment, sglx_subject.name)
     lfp = core.drop_artifacts(lfp, artifacts, hg)
 

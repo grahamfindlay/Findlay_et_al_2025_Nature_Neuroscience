@@ -7,9 +7,9 @@ import numpy as np
 import pandas as pd
 import ripple_detection.detectors
 import xarray as xr
-from ecephys.npsig import event_detection
 from scipy import signal
 
+from ecephys.npsig.events import detection
 from findlay2025a import agg, core
 from findlay2025a.constants import Bands, Files
 
@@ -161,7 +161,7 @@ def get_peak_info(sig: xr.DataArray, evts: pd.DataFrame) -> pd.DataFrame:
     """
     evts = evts.copy()
     if len(evts) == 0:
-        evts[["pk_amp", "pk_time", "pk_chan_id"]] = np.NaN
+        evts[["pk_amp", "pk_time", "pk_chan_id"]] = np.nan
         return evts
 
     def _get_peak_info(evt):
@@ -190,9 +190,9 @@ def detect_ripples(
         return get_empty_ripple_dataframe()
 
     if threshold_type == "zscore":
-        fn = event_detection.detect_by_zscore
+        fn = detection.detect_by_zscore
     elif threshold_type == "value":
-        fn = event_detection.detect_by_value
+        fn = detection.detect_by_value
     else:
         raise ValueError(f"thresholdType {threshold_type} not recognized.")
 
@@ -212,14 +212,14 @@ def detect_ripples(
         control_ser = get_ripple_detection_series(
             control_lfp, n_fine_detection_chans=n_fine
         )
-        control_ripples = event_detection.detect_by_value(
+        control_ripples = detection.detect_by_value(
             control_ser.values,
             control_ser["time"].values,
             ripples.attrs["detection_threshold"],
             ripples.attrs["boundary_threshold"],
             ripples.attrs["minimum_duration"],
         )
-        ripples = event_detection.touch_and_die(ripples, control_ripples)
+        ripples = detection.touch_and_die(ripples, control_ripples)
 
     ripples.attrs["detection_channel_ids"] = detection_lfp["channel"].values
     ripples.attrs["n_fine"] = n_fine
@@ -243,7 +243,9 @@ def read_ripples(
     return ripples
 
 
-def aggregate_ripples() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def aggregate_ripples() -> Tuple[
+    pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame
+]:
     keep = [
         "state",
         "duration",

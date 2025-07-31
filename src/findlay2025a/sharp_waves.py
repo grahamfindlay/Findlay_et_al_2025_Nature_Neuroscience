@@ -3,8 +3,8 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 import xarray as xr
-from ecephys.npsig import event_detection
 
+from ecephys.npsig.events import detection
 from findlay2025a import agg, core
 from findlay2025a.constants import Files
 
@@ -57,7 +57,7 @@ def get_peak_info(sig: xr.DataArray, evts: pd.DataFrame) -> pd.DataFrame:
     """
     evts = evts.copy()
     if len(evts) == 0:
-        evts[["pk_amp", "pk_time", "pk_chan_id"]] = np.NaN
+        evts[["pk_amp", "pk_time", "pk_chan_id"]] = np.nan
         return evts
 
     def _get_peak_info(evt):
@@ -81,9 +81,9 @@ def detect_sinks(
     ser = get_sink_detection_series(csd, n_fine_detection_chans=n_fine)
 
     if threshold_type == "zscore":
-        fn = event_detection.detect_by_zscore
+        fn = detection.detect_by_zscore
     elif threshold_type == "value":
-        fn = event_detection.detect_by_value
+        fn = detection.detect_by_value
     else:
         raise ValueError(f"thresholdType {threshold_type} not recognized.")
 
@@ -118,7 +118,7 @@ def read_spws(
     return spws
 
 
-def aggregate_spws() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def aggregate_spws() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     keep = [
         "state",
         "duration",

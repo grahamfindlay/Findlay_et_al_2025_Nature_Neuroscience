@@ -3,10 +3,10 @@ import logging
 import numpy as np
 import pactools
 import xarray as xr
-from ecephys import wne
 from tqdm.auto import tqdm
 
-from findlay2025a import core
+from ecephys import wne
+from findlay2025a import core, hypnograms
 from findlay2025a.constants import Files
 
 logger = logging.getLogger(__name__)
@@ -20,8 +20,9 @@ LOW_FQ_WIDTH = 3.2
 def get_pac_lfp(
     experiment: str, sglx_subject: wne.sglx.SGLXSubject, state: str, duration: float
 ) -> xr.DataArray:
-    s3 = core.get_project("shared")
-    full_hg = s3.load_float_hypnogram(experiment, sglx_subject.name, simplify=True)
+    full_hg = hypnograms.load_consolidated_hypnogram(
+        experiment, sglx_subject.name, simplify=True, clean=True
+    )
     hg = full_hg.keep_states([state]).keep_first(duration)
     lf = core.open_hippocampal_lfps(sglx_subject.name, experiment)
     return xr.concat(

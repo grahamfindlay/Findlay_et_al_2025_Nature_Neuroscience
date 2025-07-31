@@ -1,0 +1,13 @@
+\makeatletter
+\renewcommand{\maketitle}{%
+  \thispagestyle{empty}
+  \begingroup
+  \setlength{\parindent}{0pt}
+  \setlength{\parskip}{4pt}
+  \raggedright
+  {\LARGE \bfseries \sffamily \@title \par}
+  {\large \sffamily \@author \par}
+  {\sffamily \@date \par}
+  \endgroup
+}
+\makeatother

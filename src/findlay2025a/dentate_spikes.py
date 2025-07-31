@@ -6,8 +6,8 @@ import pandas as pd
 import scipy.signal
 import scipy.stats
 import xarray as xr
-from ecephys import dasig, xrsig
 
+from ecephys import dasig, xrsig
 from findlay2025a import agg, core
 from findlay2025a.constants import Files
 
@@ -20,7 +20,7 @@ def extract_dentate_spikes(
     df: pd.DataFrame,
     reference_spikes: pd.DataFrame = None,
     dvorak_width: tuple[float, float] = (0.005, 0.015),
-    jones_width: tuple[float, float] = (0.000, np.Inf),
+    jones_width: tuple[float, float] = (0.000, np.inf),
     dvorak_zlog_prominence: float = 1.5,
     findlay_zlog_prominence: float = 1.5,
 ) -> pd.DataFrame:
@@ -62,8 +62,13 @@ def read_dspks(
     return dspks
 
 
-def aggregate_dspks() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    keep = ["state", "zlog_height", "dvorak_zlog_prominence", "findlay_zlog_prominence"]
+def aggregate_dspks() -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    keep = [
+        "state",
+        "zlog_height",
+        "dvorak_zlog_prominence",
+        "findlay_zlog_prominence",
+    ]
     return agg.aggregate_events(read_dspks, "peak_time", keep)
 
 

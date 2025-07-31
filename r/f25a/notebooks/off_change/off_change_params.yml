@@ -1,0 +1,12 @@
+- title: "Cortical OFF duration in Early vs Late Novel Objects Deprivation"
+  fstem: RevFig999
+  response_variable: "Duration"
+- title: "Cortical OFF span in Early vs Late Novel Objects Deprivation"
+  fstem: RevFig999
+  response_variable: "Span"
+- title: "Cortical OFF frequency in Early vs Late Novel Objects Deprivation"
+  fstem: RevFig999
+  response_variable: "Frequency"
+- title: "Cortical OFF area in Early vs Late Novel Objects Deprivation"
+  fstem: RevFig999
+  response_variable: "Area"

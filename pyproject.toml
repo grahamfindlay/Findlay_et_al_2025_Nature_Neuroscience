@@ -6,9 +6,9 @@ authors = [
 ]
 description = "Code for `Hippocampal sharp wave sleep: a unifying view of sleep in the hippocampus`."
 readme = "README.md"
-requires-python = ">=3.12.7, <4.0"
+requires-python = ">=3.13"
 dependencies = [
-    "ecephys[load-sorting]",
+    "ecephys",
     "msalign>=0.2.0",
     "pactools>=0.3.1",
     "ripple-detection>=1.5.1",
@@ -25,5 +25,5 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.uv.sources]
-ecephys = { git = "https://github.com/CSC-UW/ecephys.git", branch = "develop", extra = "load-sorting" }
-wisc-ecephys-tools = { git = "https://github.com/CSC-UW/wisc-ecephys-tools.git", branch = "main" }
+ecephys = { git = "https://github.com/CSC-UW/ecephys.git", branch = "develop" }
+wisc-ecephys-tools = { git = "https://github.com/CSC-UW/wisc_ecephys_tools.git", branch = "main" }

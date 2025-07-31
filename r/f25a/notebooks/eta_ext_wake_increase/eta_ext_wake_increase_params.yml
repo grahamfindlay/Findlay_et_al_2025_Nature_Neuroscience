@@ -1,0 +1,3 @@
+- title: "Cortical 2-6 Hz power increase with EXT Wake (Extended Data Fig. 3E)"
+  fstem: ExtFig3E
+  response_variable: "Cortical.Eta" 

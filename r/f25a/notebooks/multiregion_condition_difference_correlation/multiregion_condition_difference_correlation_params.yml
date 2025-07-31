@@ -1,0 +1,84 @@
+# CX-HC Rebounds
+- title: "Cortical iDelta rebound vs. SPW rate rebound (Fig. 4D)"
+  fstem: Fig4D1
+  x_variable: "SPW.Rate.Rebound"
+  y_variable: "Cortical.iDelta.Rebound"
+- title: "Cortical iDelta rebound vs. SPW amplitude rebound (Fig. 4D)"
+  fstem: Fig4D2
+  x_variable: "SPW.Amplitude.Rebound"
+  y_variable: "Cortical.iDelta.Rebound"
+- title: "Cortical iDelta rebound vs. ripple rate rebound (Fig. 4D)"
+  fstem: Fig4D3
+  x_variable: "Ripple.Rate.Rebound"
+  y_variable: "Cortical.iDelta.Rebound"
+- title: "Cortical iDelta rebound vs. ripple frequency rebound (Fig. 4D)"
+  fstem: Fig4D4
+  x_variable: "Ripple.Frequency.Rebound"
+  y_variable: "Cortical.iDelta.Rebound"
+- title: "Cortical iDelta rebound vs. DSPK amplitude rebound (Fig. 4D)"
+  fstem: Fig4D5
+  x_variable: "DSPK.Amplitude.Rebound"
+  y_variable: "Cortical.iDelta.Rebound"
+# CX-HC Surges
+- title: "Cortical iDelta surge vs. SPW rate surge (Fig. 4E)"
+  fstem: Fig4E1
+  x_variable: "SPW.Rate.Surge"
+  y_variable: "Cortical.iDelta.Surge"
+- title: "Cortical iDelta surge vs. SPW amplitude surge (Fig. 4E)"
+  fstem: Fig4E2
+  x_variable: "SPW.Amplitude.Surge"
+  y_variable: "Cortical.iDelta.Surge"
+- title: "Cortical iDelta surge vs. ripple rate surge (Fig. 4E)"
+  fstem: Fig4E3
+  x_variable: "Ripple.Rate.Surge"
+  y_variable: "Cortical.iDelta.Surge"
+- title: "Cortical iDelta surge vs. ripple frequency surge (Fig. 4E)"
+  fstem: Fig4E4
+  x_variable: "Ripple.Frequency.Surge"
+  y_variable: "Cortical.iDelta.Surge"
+- title: "Cortical iDelta surge vs. DSPK amplitude surge (Fig. 4E)"
+  fstem: Fig4E5
+  x_variable: "DSPK.Amplitude.Surge"
+  y_variable: "Cortical.iDelta.Surge"
+# CX-HC REC Declines
+- title: "Cortical iDelta recovery decline vs. SPW rate recovery decline (Extended Data Fig. 8E)"
+  fstem: ExtFig8E1
+  x_variable: "SPW.Rate.REC.Decline"
+  y_variable: "Cortical.iDelta.REC.Decline"
+- title: "Cortical iDelta recovery decline vs. SPW amplitude recovery decline (Extended Data Fig. 8E)"
+  fstem: ExtFig8E2
+  x_variable: "SPW.Amplitude.REC.Decline"
+  y_variable: "Cortical.iDelta.REC.Decline"
+- title: "Cortical iDelta recovery decline vs. ripple rate recovery decline (Extended Data Fig. 8E)"
+  fstem: ExtFig8E3
+  x_variable: "Ripple.Rate.REC.Decline"
+  y_variable: "Cortical.iDelta.REC.Decline"
+- title: "Cortical iDelta recovery decline vs. ripple frequency recovery decline (Extended Data Fig. 8E)"
+  fstem: ExtFig8E4
+  x_variable: "Ripple.Frequency.REC.Decline"
+  y_variable: "Cortical.iDelta.REC.Decline"
+- title: "Cortical iDelta recovery decline vs. DSPK amplitude recovery decline (Extended Data Fig. 8E)"
+  fstem: ExtFig8E5
+  x_variable: "DSPK.Amplitude.REC.Decline"
+  y_variable: "Cortical.iDelta.REC.Decline"
+# CX-HC BSL Declines
+- title: "Cortical iDelta baseline decline vs. SPW rate baseline decline (Extended Data Fig. 8F)"
+  fstem: ExtFig8F1
+  x_variable: "SPW.Rate.BSL.Decline"
+  y_variable: "Cortical.iDelta.BSL.Decline"
+- title: "Cortical iDelta baseline decline vs. SPW amplitude baseline decline (Extended Data Fig. 8F)"
+  fstem: ExtFig8F2
+  x_variable: "SPW.Amplitude.BSL.Decline"
+  y_variable: "Cortical.iDelta.BSL.Decline"
+- title: "Cortical iDelta baseline decline vs. ripple rate baseline decline (Extended Data Fig. 8F)"
+  fstem: ExtFig8F3
+  x_variable: "Ripple.Rate.BSL.Decline"
+  y_variable: "Cortical.iDelta.BSL.Decline"
+- title: "Cortical iDelta baseline decline vs. ripple frequency baseline decline (Extended Data Fig. 8F)"
+  fstem: ExtFig8F4
+  x_variable: "Ripple.Frequency.BSL.Decline"
+  y_variable: "Cortical.iDelta.BSL.Decline"
+- title: "Cortical iDelta baseline decline vs. DSPK amplitude baseline decline (Extended Data Fig. 8F)"
+  fstem: ExtFig8F5
+  x_variable: "DSPK.Amplitude.BSL.Decline"
+  y_variable: "Cortical.iDelta.BSL.Decline"

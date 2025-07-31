@@ -1,6 +1,5 @@
 from ecephys import wne
 from ecephys.wne.sglx.pipeline import consolidate_artifact_annotations
-
 from findlay2025a import core
 
 

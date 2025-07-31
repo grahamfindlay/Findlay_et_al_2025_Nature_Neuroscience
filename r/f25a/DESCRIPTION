@@ -1,0 +1,20 @@
+Package: f25a
+Title: Statistical Analysis Functions for Findlay et al. 2025a
+Version: 0.0.0.9000
+Authors@R: 
+    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+Description: Statistical analysis functions and data loading utilities for the
+    Findlay et al. 2025a manuscript on sleep homeostasis and cortical activity.
+License: CC BY-NC-ND 4.0 + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    arrow,
+    assertthat,
+    dplyr,
+    fastDummies,
+    ggplot2,
+    lme4,
+    modelbased,
+    multcomp

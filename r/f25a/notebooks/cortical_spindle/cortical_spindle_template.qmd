@@ -1,0 +1,125 @@
+---
+params:
+  title: "Cortical spindle rate (Extended Data Fig. 7C)"
+  fstem: "ExtFig7C1"
+  response_variable: "Cortical.Spindle.Rate"
+title: "`r params$title`"
+---
+```{r}
+#| include: false
+#| eval: false
+params <- list()
+params$response_variable <- "Cortical.Spindle.Rate"
+```
+
+```{r}
+#| include: false
+library(arrow)
+library(lme4)
+library(multcomp)
+library(stats)
+devtools::load_all()
+
+r <- list()
+path <- system.file("extdata",
+    "cortical_spindle_condition_measures.pqt",
+    package = "f25a"
+)
+d <- arrow::read_parquet(path)
+exp_levels <- c("Novelty", "Locomotion", "Dual")
+d$experiment <- factor(d$experiment, levels = exp_levels)
+d$subject <- factor(d$subject)
+condition_levels <- c(
+    "Early.BSL.NREM",
+    "Late.BSL.NREM",
+    "Early.REC.NREM",
+    "Late.REC.NREM"
+)
+d <- subset(d, d$condition %in% condition_levels)
+d$condition <- factor(d$condition, levels = condition_levels)
+
+r$data <- d
+response_variable <- params$response_variable
+
+r$models <- fit_nested_models(
+    r$data,
+    response_variable,
+    "condition",
+    "experiment",
+    "subject"
+)
+novelty_cm <- homeostasis_novelty_matrix[c(1, 2, 4, 5), c(1, 2, 5, 6, 7, 8, 9, 12, 13, 14, 17, 18), drop = FALSE]
+locomotion_cm <- homeostasis_locomotion_matrix[c(1, 2, 4, 5), c(1, 2, 5, 6, 7, 8, 9, 12, 13, 14, 17, 18), drop = FALSE]
+dual_cm <- homeostasis_dual_matrix[c(1, 2, 4, 5), c(1, 2, 5, 6, 7, 8, 9, 12, 13, 14, 17, 18), drop = FALSE]
+main_effect_cm <- homeostasis_main_effect_matrix[c(1, 2, 4, 5), c(1, 2, 5, 6, 7, 8), drop = FALSE]
+r$interaction <- test_interaction_with_experiment(
+    r$data,
+    r$models,
+    novelty_cm,
+    locomotion_cm,
+    dual_cm
+)
+if (r$interaction$pval >= 0.05) {
+    r$main_effect <- test_main_effect(
+        r$data,
+        r$models,
+        main_effect_cm
+    )
+}
+result <- r
+
+# Check model fit and assumptions
+plot(result$models$full) # Plot model fit
+qqnorm(residuals(result$models$full)) # QQ plot of residuals
+qqline(residuals(result$models$full)) # Add QQ line
+
+sig_interaction <- result$interaction$pval < 0.05
+sig_main_effect <-
+    !sig_interaction && (result$main_effect$pval < 0.05)
+
+if (sig_interaction) {
+    interaction_effect_size_msg <- paste(
+        "Cohen's local f^2 analogue for interaction:",
+        format(round(result$interaction$effect_size$fsquared, 3), nsmall = 3)
+    )
+    nod_msg <- format_posthoc_summary(result$interaction$posthoc$nod)
+    cow_msg <- format_posthoc_summary(result$interaction$posthoc$cow)
+    ctn_msg <- format_posthoc_summary(result$interaction$posthoc$ctn)
+}
+
+if (sig_main_effect) {
+    main_effect_effect_size_msg <- paste(
+        "Cohen's local f^2 analogue for main effect:",
+        format(round(result$main_effect$effect_size$fsquared, 3), nsmall = 3)
+    )
+    pst_msg <- format_posthoc_summary(result$main_effect$posthoc)
+}
+```
+
+```{r}
+# Test for interaction between condition and experiment.
+print(result$interaction$anova)
+```
+
+```{r}
+#| eval: !expr 'sig_interaction'
+#| include: !expr 'sig_interaction'
+print(interaction_effect_size_msg)
+cat(nod_msg, sep = "\n") # Post-hoc tests for Novelty.
+cat(cow_msg, sep = "\n") # Post-hoc tests for Locomotion.
+cat(ctn_msg, sep = "\n") # Post-hoc tests for Dual.
+```
+
+```{r}
+#| eval: !expr '!sig_interaction'
+#| include: !expr '!sig_interaction'
+# Test for main effect of condition.
+print(result$main_effect$anova)
+```
+
+```{r}
+#| eval: !expr 'sig_main_effect'
+#| include: !expr 'sig_main_effect'
+print(main_effect_effect_size_msg)
+cat(pst_msg, sep = "\n") # Post-hoc tests in the absence of interaction.
+```

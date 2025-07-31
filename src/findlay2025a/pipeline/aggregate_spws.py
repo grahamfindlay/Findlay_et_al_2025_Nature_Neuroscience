@@ -5,7 +5,7 @@ from findlay2025a.constants import Files
 def do_project():
     nb = core.get_project("seahorse")
 
-    spws, _, c_rates = sharp_waves.aggregate_spws()
+    spws, _, _, c_rates = sharp_waves.aggregate_spws()
 
     c_spws = agg.aggregated_events_wide_to_long(spws)
     c_means = (
@@ -37,7 +37,4 @@ def do_project():
     spws.to_parquet(nb.get_project_file(Files.CLASSIC_SPWS))
     c_rates.to_parquet(nb.get_project_file(Files.SPW_CONDITION_RATES))
     c_means.to_parquet(nb.get_project_file(Files.SPW_CONDITION_MEANS))
-    c_sums.to_parquet(
-        nb.get_project_file(Files.SPW_CONDITION_SUMS)
-    )  # TODO: Remove, never used.
     contrasts.to_parquet(nb.get_project_file(Files.SPW_CONDITION_CONTRASTS))

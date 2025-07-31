@@ -1,0 +1,86 @@
+---
+params:
+  title: "Cortical SWA rebound vs. SPW rate rebound (Fig. 4B)"
+  fstem: Fig4B1
+  x_variable: "SPW.Rate.Rebound"
+  y_variable: "Cortical.SWA.Rebound"
+title: "`r params$title`"
+---
+```{r}
+#| include: false
+#| eval: false
+params <- list()
+params$x_variable <- "Cortical.SWA.Rebound"
+params$y_variable <- "SPW.Rate.Rebound"
+```
+
+```{r}
+#| include: false
+library(devtools)
+library(here)
+devtools::load_all()
+
+fig_dir <- here::here("_figures", "contrast_correlation")
+
+result <- test_condition_diff_corr(params$x_variable, params$y_variable)
+
+# Check model fit and assumptions
+plot(result$models$full) # Plot model fit
+qqnorm(residuals(result$models$full)) # QQ plot of residuals
+qqline(residuals(result$models$full)) # Add QQ line
+
+sig_interaction <- result$interaction$pval < 0.05
+sig_main_effect <- !sig_interaction && (result$main_effect$pval < 0.05)
+
+if (sig_interaction) {
+    interaction_effect_size_msg <- paste(
+        "Cohen's local f^2 analogue for interaction:",
+        format(round(result$interaction$effect_size$fsquared, 3), nsmall = 3)
+    )
+    pst_msg <- format_posthoc_summary(result$interaction$posthoc)
+}
+
+if (sig_main_effect) {
+    main_effect_effect_size_msg <- paste(
+        "Cohen's local f^2 analogue for main effect:",
+        format(round(result$main_effect$effect_size$fsquared, 3), nsmall = 3)
+    )
+}
+```
+
+```{r}
+# Test for interaction between primary covariate and experiment.
+print(result$interaction$anova)
+```
+
+```{r}
+#| eval: !expr 'sig_interaction'
+#| include: !expr 'sig_interaction'
+print(interaction_effect_size_msg)
+cat(pst_msg, sep = "\n") # Post-hoc tests for each experiment.
+```
+
+```{r}
+#| eval: !expr '!sig_interaction'
+#| include: !expr '!sig_interaction'
+# Test for main effect of condition.
+print(result$main_effect$anova)
+```
+
+```{r}
+#| eval: !expr 'sig_main_effect'
+#| include: !expr 'sig_main_effect'
+print(main_effect_effect_size_msg)
+```
+
+```{r}
+#| eval: !expr 'sig_interaction'
+#| include: false
+plot_correlation_with_experiment_interaction(result, params$y_variable, params$x_variable, fig_dir)
+```
+
+```{r}
+#| eval: !expr '!sig_interaction'
+#| include: false
+plot_correlation_without_experiment_interaction(result, params$y_variable, params$x_variable, fig_dir)
+```

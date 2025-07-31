@@ -1,16 +1,16 @@
 import pathlib
 import warnings
 from types import MappingProxyType
-from typing import Final, Generator, Tuple
+from typing import Final, Generator, List, Tuple
 
 import numpy as np
 import pandas as pd
 import scipy.signal
-import wisc_ecephys_tools as wet
 import xarray as xr
+
+import wisc_ecephys_tools as wet
 from ecephys import hypnogram, utils, wne, xrsig
 from ecephys.wne.constants import Files as WNEFiles
-
 from findlay2025a.constants import Bands, Files
 from findlay2025a.constants import Experiments as Exps
 
@@ -61,16 +61,41 @@ SIMPLIFIED_STATES = MappingProxyType(
         "None": "Other",
     }
 )
-ARTIFACT_STATES: Final[Tuple[str, ...]] = tuple(
-    [k for k, v in SIMPLIFIED_STATES.items() if v == "Artifact"]
-)
+ARTIFACT_STATES: Final[List[str]] = [
+    k for k, v in SIMPLIFIED_STATES.items() if v == "Artifact"
+]
+
+EXPERIMENT_DISPLAY_NAMES = {
+    Exps.NOD: "Novelty",
+    Exps.COW: "Locomotion",
+    Exps.CTN: "Dual",
+}
+
+CONDITION_DISPLAY_NAMES = {
+    "early_bsl_nrem": "Early.BSL.NREM",
+    "early_rec_nrem_match": "Late.BSL.NREM",
+    "early_ext_wake": "Early.EXT.Wake",
+    "late_ext_wake": "Late.EXT.Wake",
+    "early_rec_nrem": "Early.REC.NREM",
+    "late_rec_nrem": "Late.REC.NREM",
+    "early_nod_wake": "Early.NOD.Wake",
+    "early_sd_wake": "Early.SD.Wake",
+    "late_sd_wake": "Late.SD.Wake",
+    "sd_wake": "SD.Wake",
+    "ext_wake": "EXT.Wake",
+    "nod_wake": "NOD.Wake",
+    "cow_wake": "COW.Wake",
+    "ctn_wake": "CTN.Wake",
+    "late_cow_wake": "Late.COW.Wake",
+}
 
 
+# TODO: Replace with wet.get_sglx_project()
 def get_project(name: str = "seahorse") -> wne.sglx.SGLXProject:
     return _WNE_PROJECTS[name]
 
 
-def get_subjects(experiment):
+def get_subjects(experiment: str) -> list[str]:
     return [sub for sub, exps in MANIFEST.items() if experiment in exps]
 
 
@@ -105,11 +130,16 @@ def get_estimation_bounds(
     wne_subject: wne.sglx.SGLXSubject, experiment: str
 ) -> tuple[float, float]:
     params = get_experiment_params(experiment, wne_subject.name)
-    probe = params["spwrProbe"]
     start_datetime = pd.to_datetime(params["estmPeriod"][0])
     end_datetime = pd.to_datetime(params["estmPeriod"][1])
-    start_time = wne_subject.dt2t(experiment, probe, start_datetime)
-    end_time = wne_subject.dt2t(experiment, probe, end_datetime)
+    start_time = wne_subject.dt2t(experiment, "imec0", start_datetime)
+    end_time = wne_subject.dt2t(experiment, "imec0", end_datetime)
+    # Using imec0 here is a bit of a hack, to ensure that the times are in the
+    # canonical timebase. It should not matter which probe is used.
+    # The biggest drawback of this approach is that imec0 needs to be available.
+    # If it were not, we'd have to:
+    # 1. Take `probe` as an argument.
+    # 2. Create a time synchronizer object here and use that.
     return start_time, end_time
 
 
@@ -133,21 +163,16 @@ def open_lfps(
 ) -> xr.DataArray:
     s3 = get_project("shared")
     probe = get_spw_probe(experiment, subject)
-    lfp = wne.utils.open_lfps(
+    badchan_proj = s3 if drop_bad_channels else None
+    return wne.utils.open_lfps(
         get_project("seahorse"),
         subject,
         experiment,
         probe,
         anatomy_proj=s3,
+        badchan_proj=badchan_proj,
         **kwargs,
     )
-    if drop_bad_channels:
-        params = get_project("shared").load_experiment_subject_params(
-            experiment, subject
-        )
-        bad_channels = params["probes"][probe]["badChannels"]
-        lfp = lfp.drop_sel({"channel": bad_channels})
-    return lfp
 
 
 def get_hippocampal_bounds(experiment: str, subject: str):
@@ -257,6 +282,7 @@ def get_hippocampal_psds_file(subject: str, experiment: str) -> pathlib.Path:
 
 
 # TODO: These is obsolete, and can be replaced with something much simpler.
+# See ecephys.wne.sglx.utils.load_consolidated_artifacts().
 def load_artifacts(
     experiment: str, subject: str, as_hypnogram: bool = True
 ) -> pd.DataFrame:

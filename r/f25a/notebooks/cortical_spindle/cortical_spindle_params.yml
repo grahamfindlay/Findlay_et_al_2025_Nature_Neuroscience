@@ -1,0 +1,18 @@
+- title: Cortical spindle rate (Extended Data Fig. 7C)
+  fstem: ExtFig7C1
+  response_variable: Cortical.Spindle.Rate
+- title: Cortical spindle amplitude (Extended Data Fig. 7C)
+  fstem: ExtFig7C2
+  response_variable: Cortical.Spindle.Amplitude
+- title: Cortical spindle power (Extended Data Fig. 7C)
+  fstem: ExtFig7C3
+  response_variable: Cortical.Spindle.Power
+- title: Cortical spindle duration (Extended Data Fig. 7C)
+  fstem: ExtFig7C4
+  response_variable: Cortical.Spindle.Duration
+- title: Cortical spindle oscillations (Extended Data Fig. 7C)
+  fstem: ExtFig7C5
+  response_variable: Cortical.Spindle.Oscillations
+- title: Cortical spindle frequency (Extended Data Fig. 7C)
+  fstem: ExtFig7C6
+  response_variable: Cortical.Spindle.Frequency

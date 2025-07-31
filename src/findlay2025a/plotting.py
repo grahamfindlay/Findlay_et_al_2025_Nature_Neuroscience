@@ -14,6 +14,18 @@ def get_paired_palette():
     return PAIRED_PALETTE
 
 
+def get_nrem_homeostasis_palette():
+    p = get_paired_palette()
+    return {
+        "early_bsl_nrem": p[0],
+        "early_rec_nrem_match": p[1],
+        "early_ext_wake": p[2],
+        "late_ext_wake": p[3],
+        "early_rec_nrem": p[4],
+        "late_rec_nrem": p[5],
+    }
+
+
 #####
 # Plotting traces
 #####

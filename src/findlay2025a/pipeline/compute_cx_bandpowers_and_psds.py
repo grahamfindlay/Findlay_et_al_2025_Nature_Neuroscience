@@ -2,14 +2,15 @@
 from typing import Final
 
 import xarray as xr
-from ecephys import npsig, wne, xrsig
 
+from ecephys import npsig, wne, xrsig
 from findlay2025a import core, hypnograms
 from findlay2025a.constants import Bands
 
 STFT_CHUNK_DURATION: Final[float] = 4  # Seconds
 DO_BANDS: Final[list[Bands]] = [
     Bands.DELTA,
+    Bands.VLAD,
     Bands.THETA,
     Bands.SIGMA,
     Bands.GAMMA,

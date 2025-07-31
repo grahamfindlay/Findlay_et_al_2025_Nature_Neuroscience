@@ -2,9 +2,9 @@ from types import MappingProxyType
 from typing import Final
 
 import numpy as np
-from ecephys import wne
 
-from findlay2025a import core, sharp_waves
+from ecephys import wne
+from findlay2025a import core, hypnograms, sharp_waves
 from findlay2025a.constants import Files
 
 SPW_DETECTION_RADIUS: Final[float] = 100  # in Microns
@@ -22,13 +22,14 @@ SPW_ESTIMATION_PARAMS: Final[MappingProxyType] = MappingProxyType(
 
 def do_experiment(sglx_subject: wne.sglx.SGLXSubject, experiment: str):
     nb = core.get_project("seahorse")
-    s3 = core.get_project("shared")
 
     t1, t2 = core.get_estimation_bounds(sglx_subject, experiment)
     kcsd = core.open_kcsd(sglx_subject.name, experiment).sel(time=slice(t1, t2))
 
     # Drop artifacts
-    hg = s3.load_float_hypnogram(experiment, sglx_subject.name, simplify=True)
+    hg = hypnograms.load_consolidated_hypnogram(
+        experiment, sglx_subject.name, simplify=True, clean=True
+    )
     artifacts = core.load_artifacts(experiment, sglx_subject.name)
     kcsd = core.drop_artifacts(kcsd, artifacts, hg)
 

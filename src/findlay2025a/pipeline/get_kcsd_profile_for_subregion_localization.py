@@ -1,7 +1,7 @@
 import xarray as xr
-from ecephys import utils, wne
 
-from findlay2025a import core
+from ecephys import utils, wne
+from findlay2025a import core, hypnograms
 from findlay2025a.constants import Files
 
 
@@ -17,8 +17,9 @@ def do_experiment(sglx_subject: wne.sglx.SGLXSubject, experiment: str):
     kcsd = kcsd.sel(time=slice(t1, t2))
 
     # Drop artifacts
-    s3 = core.get_project("shared")
-    hg = s3.load_float_hypnogram(experiment, sglx_subject.name, simplify=True)
+    hg = hypnograms.load_consolidated_hypnogram(
+        experiment, sglx_subject.name, simplify=True, clean=True
+    )
     artifacts = core.load_artifacts(experiment, sglx_subject.name)
     kcsd = core.drop_artifacts(kcsd, artifacts, hg)
 

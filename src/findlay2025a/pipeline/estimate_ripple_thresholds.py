@@ -2,9 +2,9 @@ from types import MappingProxyType
 from typing import Final
 
 import numpy as np
-from ecephys import wne
 
-from findlay2025a import core, ripples
+from ecephys import wne
+from findlay2025a import core, hypnograms, ripples
 from findlay2025a.constants import Files
 
 RIPPLE_DETECTION_RADIUS: Final = (
@@ -33,9 +33,9 @@ def do_experiment(sglx_subject: wne.sglx.SGLXSubject, experiment):
     ).sel(time=slice(t1, t2))
 
     # Drop artifacts
-    nb = core.get_project("seahorse")
-    s3 = core.get_project("shared")
-    hg = s3.load_float_hypnogram(experiment, sglx_subject.name, simplify=True)
+    hg = hypnograms.load_consolidated_hypnogram(
+        experiment, sglx_subject.name, simplify=True, clean=True
+    )
     artifacts = core.load_artifacts(experiment, sglx_subject.name)
     lfp = core.drop_artifacts(lfp, artifacts, hg)
     wm_lfp = core.drop_artifacts(wm_lfp, artifacts, hg)
@@ -53,6 +53,7 @@ def do_experiment(sglx_subject: wne.sglx.SGLXSubject, experiment):
     rips = ripples.detect_ripples(
         detection_lfp, **RIPPLE_DETECTION_PARAMS, control_lfp=control_lfp
     )
+    nb = core.get_project("seahorse")
     ripple_params_file = nb.get_experiment_subject_file(
         experiment, sglx_subject.name, Files.RIPPLE_PARAMS
     )

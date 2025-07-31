@@ -1,0 +1,104 @@
+# CX-HC Rebounds
+- title: "Cortical SWA rebound vs. SPW rate rebound (Fig. 4B)"
+  fstem: Fig4B1
+  x_variable: "SPW.Rate.Rebound"
+  y_variable: "Cortical.SWA.Rebound"
+- title: "Cortical SWA rebound vs. SPW amplitude rebound (Fig. 4B)"
+  fstem: Fig4B2
+  x_variable: "SPW.Amplitude.Rebound"
+  y_variable: "Cortical.SWA.Rebound"
+- title: "Cortical SWA rebound vs. ripple rate rebound (Fig. 4B)"
+  fstem: Fig4B3
+  x_variable: "Ripple.Rate.Rebound"
+  y_variable: "Cortical.SWA.Rebound"
+- title: "Cortical SWA rebound vs. ripple frequency rebound (Fig. 4B)"
+  fstem: Fig4B4
+  x_variable: "Ripple.Frequency.Rebound"
+  y_variable: "Cortical.SWA.Rebound"
+- title: "Cortical SWA rebound vs. DSPK amplitude rebound (Fig. 4B)"
+  fstem: Fig4B5
+  x_variable: "DSPK.Amplitude.Rebound"
+  y_variable: "Cortical.SWA.Rebound"
+# CX-HC Surges
+- title: "Cortical SWA surge vs. SPW rate surge (Fig. 4C)"
+  fstem: Fig4C1
+  x_variable: "SPW.Rate.Surge"
+  y_variable: "Cortical.SWA.Surge"
+- title: "Cortical SWA surge vs. SPW amplitude surge (Fig. 4C)"
+  fstem: Fig4C2
+  x_variable: "SPW.Amplitude.Surge"
+  y_variable: "Cortical.SWA.Surge"
+- title: "Cortical SWA surge vs. ripple rate surge (Fig. 4C)"
+  fstem: Fig4C3
+  x_variable: "Ripple.Rate.Surge"
+  y_variable: "Cortical.SWA.Surge"
+- title: "Cortical SWA surge vs. ripple frequency surge (Fig. 4C)"
+  fstem: Fig4C4
+  x_variable: "Ripple.Frequency.Surge"
+  y_variable: "Cortical.SWA.Surge"
+- title: "Cortical SWA surge vs. DSPK amplitude surge (Fig. 4C)"
+  fstem: Fig4C5
+  x_variable: "DSPK.Amplitude.Surge"
+  y_variable: "Cortical.SWA.Surge"
+# Intra-HC rebounds
+- title: "DSPK amplitude rebound vs. SPW rate rebound (Extended Data Fig. 8B)"
+  fstem: ExtFig8B1
+  x_variable: "SPW.Rate.Rebound"
+  y_variable: "DSPK.Amplitude.Rebound"
+- title: "DSPK amplitude rebound vs. SPW amplitude rebound (Extended Data Fig. 8B)"
+  fstem: ExtFig8B2
+  x_variable: "SPW.Amplitude.Rebound"
+  y_variable: "DSPK.Amplitude.Rebound"
+- title: "DSPK amplitude rebound vs. ripple rate rebound (Extended Data Fig. 8B)"
+  fstem: ExtFig8B3
+  x_variable: "Ripple.Rate.Rebound"
+  y_variable: "DSPK.Amplitude.Rebound"
+- title: "DSPK amplitude rebound vs. ripple frequency rebound (Extended Data Fig. 8B)"
+  fstem: ExtFig8B4
+  x_variable: "Ripple.Frequency.Rebound"
+  y_variable: "DSPK.Amplitude.Rebound"
+# CX-HC REC Declines
+- title: "Cortical SWA recovery decline vs. SPW rate recovery decline (Extended Data Fig. 8C)"
+  fstem: ExtFig8C1
+  x_variable: "SPW.Rate.REC.Decline"
+  y_variable: "Cortical.SWA.REC.Decline"
+- title: "Cortical SWA recovery decline vs. SPW amplitude recovery decline (Extended Data Fig. 8C)"
+  fstem: ExtFig8C2
+  x_variable: "SPW.Amplitude.REC.Decline"
+  y_variable: "Cortical.SWA.REC.Decline"
+- title: "Cortical SWA recovery decline vs. ripple rate recovery decline (Extended Data Fig. 8C)"
+  fstem: ExtFig8C3
+  x_variable: "Ripple.Rate.REC.Decline"
+  y_variable: "Cortical.SWA.REC.Decline"
+- title: "Cortical SWA recovery decline vs. ripple frequency recovery decline (Extended Data Fig. 8C)"
+  fstem: ExtFig8C4
+  x_variable: "Ripple.Frequency.REC.Decline"
+  y_variable: "Cortical.SWA.REC.Decline"
+- title: "Cortical SWA recovery decline vs. DSPK amplitude recovery decline (Extended Data Fig. 8C)"
+  fstem: ExtFig8C5
+  x_variable: "DSPK.Amplitude.REC.Decline"
+  y_variable: "Cortical.SWA.REC.Decline"
+# CX-HC BSL Declines
+- title: "Cortical SWA baseline decline vs. SPW rate baseline decline (Extended Data Fig. 8D)"
+  fstem: ExtFig8D1
+  x_variable: "SPW.Rate.BSL.Decline"
+  y_variable: "Cortical.SWA.BSL.Decline"
+- title: "Cortical SWA baseline decline vs. SPW amplitude baseline decline (Extended Data Fig. 8D)"
+  fstem: ExtFig8D2
+  x_variable: "SPW.Amplitude.BSL.Decline"
+  y_variable: "Cortical.SWA.BSL.Decline"
+- title: "Cortical SWA baseline decline vs. ripple rate baseline decline (Extended Data Fig. 8D)"
+  fstem: ExtFig8D3
+  x_variable: "Ripple.Rate.BSL.Decline"
+  y_variable: "Cortical.SWA.BSL.Decline"
+- title: "Cortical SWA baseline decline vs. ripple frequency baseline decline (Extended Data Fig. 8D)"
+  fstem: ExtFig8D4
+  x_variable: "Ripple.Frequency.BSL.Decline"
+  y_variable: "Cortical.SWA.BSL.Decline"
+- title: "Cortical SWA baseline decline vs. DSPK amplitude baseline decline (Extended Data Fig. 8D)"
+  fstem: ExtFig8D5
+  x_variable: "DSPK.Amplitude.BSL.Decline"
+  y_variable: "Cortical.SWA.BSL.Decline"
+
+
+

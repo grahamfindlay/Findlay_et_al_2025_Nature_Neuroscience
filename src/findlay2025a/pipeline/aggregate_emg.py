@@ -17,10 +17,6 @@ def do_project():
         .sum(numeric_only=True)
         .add_prefix("total_")
     )
-    contrasts = agg.get_contrasts(c_means)
 
     c_means.to_parquet(nb.get_project_file(Files.EMG_CONDITION_MEANS))
     c_sums.to_parquet(nb.get_project_file(Files.EMG_CONDITION_SUMS))
-    contrasts.to_parquet(
-        nb.get_project_file(Files.EMG_CONDITION_CONTRASTS)
-    )  # TODO: Remove, never used.

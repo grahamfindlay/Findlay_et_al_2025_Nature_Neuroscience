@@ -1,0 +1,22 @@
+name: r-env
+channels:
+  - conda-forge
+dependencies:
+  - r-arrow 
+  - r-assertthat
+  - r-base
+  - r-devtools
+  - r-dplyr # tidyverse
+  - r-fastdummies
+  - r-ggplot2 # tidyverse
+  - r-here
+  - r-httpgd # only if plotting in VS Code
+  - r-languageserver # not needed for Positron? 
+  - r-lme4
+  - r-modelbased
+  - r-multcomp
+  - r-quarto
+  - r-usethis
+  - r-rlang # tidyverse
+  - r-rmarkdown # no longer needed?
+  - r-tidyverse # tidyverse

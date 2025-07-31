@@ -1,8 +1,9 @@
 import math
 from enum import Enum, StrEnum
-from typing import Final, Tuple
+from typing import Final, List, Tuple
 
 
+# TODO: Just use wisc_ecephys_tools.rats.constants.SleepDeprivationExperiments
 class Experiments(StrEnum):
     NOD = "novel_objects_deprivation"
     COW = "conveyor_over_water"
@@ -11,6 +12,7 @@ class Experiments(StrEnum):
 
 class Bands(Enum):
     DELTA = (0.5, 4)
+    VLAD = (2, 6)  # TODO: Rename to eta
     THETA = (5, 10)
     SIGMA = (9, 16)
     GAMMA = (30, 150)
@@ -99,6 +101,28 @@ class Files(StrEnum):
     COMBINED_CONDITION_MEASURES = "combined_condition_measures.pqt"
     COMBINED_CONDITION_CONTRASTS = "combined_condition_contrasts.pqt"
 
+    # The following have exlusions applied, column names made R-friendly, are
+    # more human-readable, etc.
+    EXPORTED_CONDITION_MEASURES = "condition_measures.pqt"
+    EXPORTED_CONDITION_CONTRASTS = "condition_contrasts.pqt"
+
+    CORTICAL_SPINDLES = "cortical_spindles.pqt"
+    CORTICAL_SPINDLE_TROUGHS = "cortical_spindle_troughs.npz"
+    CORTICAL_SPINDLE_CONDITION_RATES = "cortical_spindle_condition_rates.pqt"
+    CORTICAL_SPINDLE_CONDITION_MEANS = "cortical_spindle_condition_means.pqt"
+    CORTICAL_SPINDLE_CONDITION_CONTRASTS = "cortical_spindle_condition_contrasts.pqt"
+
+    HIPPOCAMPAL_SPINDLES = "hippocampal_spindles.pqt"
+    HIPPOCAMPAL_SPINDLE_TROUGHS = "hippocampal_spindle_troughs.npz"
+    HIPPOCAMPAL_SPINDLE_CONDITION_RATES = "hippocampal_spindle_condition_rates.pqt"
+    HIPPOCAMPAL_SPINDLE_CONDITION_MEANS = "hippocampal_spindle_condition_means.pqt"
+    HIPPOCAMPAL_SPINDLE_CONDITION_CONTRASTS = (
+        "hippocampal_spindle_condition_contrasts.pqt"
+    )
+
+    NARROW_ACGS = "narrow_autocorrelograms.zarr"
+    WIDE_ACGS = "wide_autocorrelograms.zarr"
+
     @staticmethod
     def HIPPOCAMPAL_BANDPOWER(band: Bands) -> str:
         return f"hipp_{band.name.lower()}.nc"
@@ -116,45 +140,30 @@ class Files(StrEnum):
         return f"{state}_comodulogram_surrogate_maxes.nc"
 
 
-# TODO: Most of these are never used. Prune them.
-ALL_STATISTICAL_CONDITIONS: Final[Tuple[str, ...]] = tuple(
-    [
-        "early_bsl_nrem",
-        "early_bsl_rem",
-        "last_bsl_nrem",
-        "last_bsl_rem",
-        "bsl_wake",
-        "bsl_rem",
-        "ext_wake",
-        "early_ext_wake",
-        "late_ext_wake",
-        "sd_wake",
-        "early_sd_wake",
-        "late_sd_wake",
-        "nod_wake",
-        "early_nod_wake",
-        "late_nod_wake",
-        "cow_wake",
-        "early_cow_wake",
-        "late_cow_wake",
-        "ctn_wake",
-        "early_ctn_wake",
-        "late_ctn_wake",
-        "early_rec_nrem",
-        "early_rec_rem",
-        "late_rec_nrem",
-        "late_rec_rem",
-        "last_rec_nrem",
-        "last_rec_rem",
-        "early_rec_nrem_match",
-        "early_rec_rem_match",
-    ]
-)
+CORE_STATISTICAL_CONDITIONS: Final[List[str]] = [
+    "early_bsl_nrem",
+    "early_rec_nrem_match",
+    "early_ext_wake",
+    "late_ext_wake",
+    "early_rec_nrem",
+    "late_rec_nrem",
+    "early_nod_wake",
+    "early_sd_wake",
+    "late_sd_wake",
+    "ext_wake",
+    "sd_wake",
+    "nod_wake",
+    "cow_wake",
+    "ctn_wake",
+    "late_cow_wake",
+]  # TODO: Core is a misnomer, as it implies set intersection, rather than union.
 
+
+# TODO: This should be a dictionary, keyed by experiment.
 NOD_STATISTICAL_CONDITIONS: Final[Tuple[str, ...]] = tuple(
-    [x for x in ALL_STATISTICAL_CONDITIONS if ("cow" not in x) and ("ctn" not in x)]
+    [x for x in CORE_STATISTICAL_CONDITIONS if ("cow" not in x) and ("ctn" not in x)]
 )
 COW_STATISTICAL_CONDITIONS: Final[Tuple[str, ...]] = tuple(
-    [x for x in ALL_STATISTICAL_CONDITIONS if ("nod" not in x) and ("ctn" not in x)]
+    [x for x in CORE_STATISTICAL_CONDITIONS if ("nod" not in x) and ("ctn" not in x)]
 )
-CTN_STATISTICAL_CONDITIONS: Final[Tuple[str, ...]] = ALL_STATISTICAL_CONDITIONS
+CTN_STATISTICAL_CONDITIONS: Final[Tuple[str, ...]] = CORE_STATISTICAL_CONDITIONS

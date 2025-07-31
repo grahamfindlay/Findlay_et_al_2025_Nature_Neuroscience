@@ -1,0 +1,25 @@
+- title: "SPW.Rate during first novel object exposure in Novelty vs Dual experiments (Extended Data Fig. 5A)"
+  fstem: ExtFig5A1
+  response_variable: "SPW.Rate"
+- title: "SPW.Amplitude during first novel object exposure in Novelty vs Dual experiments (Extended Data Fig. 5A)"
+  fstem: ExtFig5A2
+  response_variable: "SPW.Amplitude"
+- title: "Ripple.Rate during first novel object exposure in Novelty vs Dual experiments (Extended Data Fig. 5B)"
+  fstem: ExtFig5B1
+  response_variable: "Ripple.Rate"
+- title: "Ripple.Amplitude during first novel object exposure in Novelty vs Dual experiments (Extended Data Fig. 5B)"
+  fstem: ExtFig5B2
+  response_variable: "Ripple.Amplitude"
+- title: "Ripple.Frequency during first novel object exposure in Novelty vs Dual experiments (Extended Data Fig. 5B)"
+  fstem: ExtFig5B3
+  response_variable: "Ripple.Frequency"
+- title: "DSPK.Rate during first novel object exposure in Novelty vs Dual experiments (Extended Data Fig. 5C)"
+  fstem: ExtFig5C1
+  response_variable: "DSPK.Rate"
+- title: "DSPK.Amplitude during first novel object exposure in Novelty vs Dual experiments (Extended Data Fig. 5C)"
+  fstem: ExtFig5C2
+  response_variable: "DSPK.Amplitude"
+
+
+
+

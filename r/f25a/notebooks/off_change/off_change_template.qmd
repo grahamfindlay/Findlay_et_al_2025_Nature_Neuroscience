@@ -1,0 +1,69 @@
+---
+params:
+  title: "Cortical OFF Area in Early vs Late Sleep Deprivation"
+  fstem: RevFig999
+  response_variable: "Area"
+title: "`r params$title`"
+---
+```{r}
+#| include: false
+#| eval: false
+params <- list()
+params$response_variable <- "Area"
+```
+
+```{r}
+#| include: false
+library(arrow)
+library(devtools)
+library(lme4)
+library(multcomp)
+devtools::load_all()
+
+r <- list()
+
+load_off_measures <- function() {
+    path <- system.file(
+        "extdata", "off_measures.pqt",
+        package = "f25a"
+    )
+    d <- arrow::read_parquet(path)
+    condition_levels <- c("Early NOD", "Late NOD")
+    d$condition <- factor(d$condition, levels = condition_levels)
+    d$subject <- factor(d$subject)
+    return(d)
+}
+
+r$data <- load_off_measures()
+r$models <- fit_basic_models(
+    r$data, params$response_variable, "condition", "subject"
+)
+r$anova <- stats::anova(r$models$full, r$models$null)
+r$sig <- get_anova_pval(r$anova) < 0.05
+if (r$sig) {
+    # Effect size for main effect of condition.
+    r$effect_size <- subtract_ranef_get_fsquared(
+        r$data, r$models$full, r$models$null
+    )
+    r$effect_size_msg <- paste(
+        "Cohen's local f^2 analogue for main effect:",
+        format(round(r$effect_size$fsquared, 3), nsmall = 3)
+    )
+    # Difference between conditions, with confidence interval.
+    r$diff <- lme4::fixef(r$models$full)[["conditionLate NOD"]]
+    r$ci <- stats::confint(
+        multcomp::glht(r$models$full, rbind("Late NOD - Early NOD" = c(0, 1)))
+    )
+}
+```
+
+```{r}
+print(r$anova) # Test for main effect of condition.
+```
+
+```{r}
+#| eval: !expr r$sig
+#| include: !expr r$sig
+print(r$effect_size_msg) # Effect size
+print(r$ci) # Difference between conditions, with confidence interval.
+```

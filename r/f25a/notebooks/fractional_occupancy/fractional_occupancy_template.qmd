@@ -1,0 +1,84 @@
+---
+params:
+  title: 'Sleep period stage occupancy (Extended Data Fig. 2A-B)'
+  fstem: ExtFig2A
+title: "`r params$title`"
+---
+```{r}
+#| include: false
+library(devtools)
+devtools::load_all()
+
+bsl <- test_single_day_occupancy("Baseline")
+rec <- test_single_day_occupancy("Recovery")
+nod <- test_single_experiment_occupancy("Novelty")
+cow <- test_single_experiment_occupancy("Locomotion")
+
+rec_intractn_effect_size_msg <- paste(
+    "Cohen's local f^2 analogue for interaction:",
+    format(round(rec$interaction$effect_size$fsquared, 3), nsmall = 3)
+)
+rec_msg <- format_posthoc_summary(rec$interaction$posthoc)
+
+nod_intractn_effect_size_msg <- paste(
+    "Cohen's local f^2 analogue for interaction:",
+    format(round(nod$interaction$effect_size$fsquared, 3), nsmall = 3)
+)
+nod_msg <- format_posthoc_summary(nod$interaction$posthoc)
+
+cow_intractn_effect_size_msg <- paste(
+    "Cohen's local f^2 analogue for interaction:",
+    format(round(cow$interaction$effect_size$fsquared, 3), nsmall = 3)
+)
+cow_msg <- format_posthoc_summary(cow$interaction$posthoc)
+```
+
+```{r}
+# Extended Data Fig. 2A, left
+print(bsl$interaction$anova) # Test for experiment * state interaction
+print(bsl$main_effect$anova) # Test for main effect of experiment
+```
+
+```{r}
+# Extended Data Fig. 2A, right
+print(rec$interaction$anova) # Test for experiment * state interaction
+print(rec_intractn_effect_size_msg)
+cat(rec_msg, sep = "\n") # Post-hoc tests
+```
+
+```{r}
+# Extended Data Fig. 2B, left
+print(nod$interaction$anova) # Test for day * state interaction
+print(nod_intractn_effect_size_msg)
+cat(nod_msg, sep = "\n") # Post-hoc tests
+```
+
+```{r}
+# Extended Data Fig. 2B, right
+print(cow$interaction$anova) # Test for day * state interaction
+print(cow_intractn_effect_size_msg)
+cat(cow_msg, sep = "\n") # Post-hoc tests
+```
+
+```{r}
+#| include: false
+# Supplementary Table 1
+library(assertthat)
+dat <- load_rec_rem_vs_ewk_tdr_data()
+models <- fit_nested_models(
+    dat, "REM.Fraction", "Total.Hippocampal.ThetaDeltaRatio", "Experiment", "Subject"
+)
+interaction <-
+    test_interaction(dat, models, correlation_interaction_matrix)
+assertthat::assert_that(interaction$pval >= 0.05)
+main_effect <- test_main_effect(dat, models)
+assertthat::assert_that(main_effect$pval >= 0.05)
+```
+
+```{r}
+# Supplementary Table 1 (No associated figure)
+# "REM fraction vs. Extended wake theta:delta"
+print(interaction$anova) # Test for interaction
+print(main_effect$anova) # Test for main effect
+```
+

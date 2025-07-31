@@ -5,7 +5,7 @@ from findlay2025a.constants import Files
 def do_project():
     nb = core.get_project("seahorse")
 
-    dspks, _, c_rates = dentate_spikes.aggregate_dspks()
+    dspks, _, _, c_rates = dentate_spikes.aggregate_dspks()
     c_dspks = agg.aggregated_events_wide_to_long(dspks)
     c_means = (
         c_dspks.groupby(["subject", "experiment", "condition"])
@@ -36,7 +36,4 @@ def do_project():
     dspks.to_parquet(nb.get_project_file(Files.DSPKS))
     c_rates.to_parquet(nb.get_project_file(Files.DSPK_CONDITION_RATES))
     c_means.to_parquet(nb.get_project_file(Files.DSPK_CONDITION_MEANS))
-    c_sums.to_parquet(
-        nb.get_project_file(Files.DSPK_CONDITION_SUMS)
-    )  # TODO: Remove, never used.
     contrasts.to_parquet(nb.get_project_file(Files.DSPK_CONDITION_CONTRASTS))

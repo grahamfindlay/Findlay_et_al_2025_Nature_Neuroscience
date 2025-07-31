@@ -1,16 +1,16 @@
 import numpy as np
 import scipy.stats
-from ecephys import wne
 
-from findlay2025a import core, dentate_spikes
+from ecephys import wne
+from findlay2025a import core, dentate_spikes, hypnograms
 from findlay2025a.constants import Files
 
 
 def do_experiment(sglx_subject: wne.sglx.SGLXSubject, experiment: str):
     nb = core.get_project("seahorse")
-    s3 = core.get_project("shared")
-
-    hg = s3.load_float_hypnogram(experiment, sglx_subject.name, simplify=True)
+    hg = hypnograms.load_consolidated_hypnogram(
+        experiment, sglx_subject.name, simplify=True, clean=True
+    )
     dspks = dentate_spikes.read_dspks(sglx_subject.name, experiment, kind="raw")
     dspks["state"] = hg.get_states(dspks["peak_time"])
     dspks["zlog_height"] = scipy.stats.zscore(np.log(dspks["peak_height"]))

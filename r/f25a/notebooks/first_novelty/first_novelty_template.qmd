@@ -1,0 +1,98 @@
+---
+params:
+  title: "SPW.Rate during first novel object exposure in Novelty vs Dual experiments (Extended Data Fig. 5A)"
+  fstem: ExtFig5A1
+  response_variable: "SPW.Rate"
+title: "`r params$title`"
+---
+```{r}
+#| include: false
+#| eval: false
+params <- list()
+params$response_variable <- "SPW.Rate"
+```
+
+```{r}
+#| include: false
+library(devtools)
+library(here)
+library(lme4)
+library(multcomp)
+devtools::load_all()
+
+# Using unbalanced data (subjects from both Novelty and Dual experiments)
+unb <- list()
+unb$data <-
+    load_measures_for_first_novelty_testing(only_dual_subjects = FALSE)
+unb$models <-
+    fit_basic_models(
+        unb$data, params$response_variable, "experiment", "subject"
+    )
+unb$anova <- anova(unb$models$full, unb$models$null)
+unb$sig <- get_anova_pval(unb$anova) < 0.05
+if (unb$sig) {
+    # Effect size for main effect of experiment.
+    unb$eff_size <-
+        subtract_ranef_get_fsquared(
+            unb$data, unb$models$full, unb$models$null
+        )
+    unb$effect_size_msg <- paste(
+        "Cohen's local f^2 analogue for main effect:",
+        format(round(unb$eff_size$fsquared, 3), nsmall = 3)
+    )
+    # Difference between experiments, with confidence interval.
+    unb$diff <- lme4::fixef(unb$models$full)[["experimentDual"]]
+    unb$ci <- confint(multcomp::glht(unb$models$full, rbind("Dual - Novelty" = c(0, 1))))
+}
+
+# Using balanced data (only subjects with both Novelty and Dual experiments)
+bal <- list()
+bal$data <-
+    load_measures_for_first_novelty_testing(only_dual_subjects = TRUE)
+bal$models <-
+    fit_basic_models(
+        bal$data, params$response_variable, "experiment", "subject"
+    )
+bal$anova <- anova(bal$models$full, bal$models$null)
+bal$sig <- get_anova_pval(bal$anova) < 0.05
+if (bal$sig) {
+    # Effect size for main effect of experiment.
+    bal$eff_size <-
+        subtract_ranef_get_fsquared(
+            bal$data, bal$models$full, bal$models$null
+        )
+    bal$effect_size_msg <- paste(
+        "Cohen's local f^2 analogue for main effect:",
+        format(round(bal$eff_size$fsquared, 3), nsmall = 3)
+    )
+    # Difference between experiments, with confidence interval.
+    bal$diff <- lme4::fixef(bal$models$full)[["experimentDual"]]
+    bal$ci <- confint(multcomp::glht(bal$models$full, rbind("Dual - Novelty" = c(0, 1))))
+}
+```
+
+```{r}
+# Unbalanced data: all subjects with either Novelty or Dual experiments.
+# Left panel of each facet.
+print(unb$anova) # Test for main effect of experiment.
+```
+
+```{r}
+#| eval: !expr 'unb$sig'
+#| include: !expr 'unb$sig'
+print(unb$effect_size_msg) # Effect size
+print(unb$ci) # Difference between experiments, with confidence interval.
+```
+
+```{r}
+# Balanced data: only subjects with both Novelty and Dual experiments.
+# Right panel of each facet.
+print(bal$anova) # Test for main effect of experiment.
+```
+
+```{r}
+#| eval: !expr 'bal$sig'
+#| include: !expr 'bal$sig'
+print(bal$effect_size_msg) # Effect size
+print(bal$ci) # Difference between experiments, with confidence interval.
+```

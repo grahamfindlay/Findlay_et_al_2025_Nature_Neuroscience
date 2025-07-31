@@ -1,0 +1,137 @@
+---
+params:
+  title: "Cortical pyramidal cell firing rates"
+  fstem: "RevFig999"
+  response_var: "Sqrt.Firing.Rate"
+  region: "cortical"
+  cell_type: "pyramidal"
+title: "`r params$title`"
+---
+```{r}
+#| include: false
+#| eval: false
+params <- list()
+params$response_var <- "Sqrt.Firing.Rate"
+params$region <- "cortical"
+params$cell_type <- "pyramidal"
+```
+```{r}
+#| include: false
+library(devtools)
+library(here)
+devtools::load_all()
+
+d <- load_firing_rates(params$response_var, params$region, params$cell_type)
+
+# Fit models
+f1 <- reformulate(
+    c("condition", "(1 | subject/cluster_id)"),
+    response = params$response_var
+) # Full model
+
+f2 <- reformulate(
+    c("(1 | subject/cluster_id)"),
+    response = params$response_var
+) # Null model
+
+# Fit models
+m1 <- lme4::lmer(f1, data = d, REML = FALSE) # Full model
+m2 <- lme4::lmer(f2, data = d, REML = FALSE) # Null model
+
+# Check model fit and assumptions
+plot(m1)
+qqnorm(residuals(m1))
+qqline(residuals(m1))
+
+# Test for main effect
+anova <- anova(m1, m2)
+effect_size <- subtract_ranef_get_fsquared(d, m1, m2)
+
+# Perform post-hocs in case main effect is significant
+contrast_matrix <- homeostasis_main_effect_matrix[, 1:6]
+ph <- list()
+ph$glht <- multcomp::glht(m1, contrast_matrix)
+ph$ci <- confint(ph$glht)
+ph$effect_size <- cohens_d_analogue(ph$glht, m1)
+
+# Check for main effect
+sig_main_effect <- get_anova_pval(anova) < 0.05
+if (sig_main_effect) {
+  main_effect_effect_size_msg <- paste(
+    "Cohen's local f^2 analogue for main effect:",
+    format(round(effect_size$fsquared, 3), nsmall = 3)
+  )
+  pst_msg <- format_posthoc_summary(ph)
+}
+```
+
+```{r}
+print(anova)
+```
+
+```{r}
+#| eval: !expr 'sig_main_effect'
+#| include: !expr 'sig_main_effect'
+print(main_effect_effect_size_msg)
+print(pst_msg)
+```
+
+```{r}
+#| include: false
+# Calculate spread measures across conditions
+library(dplyr)
+
+if (params$response_var == "Sqrt.Firing.Rate") {
+  spread_var <- "Log.Firing.Rate"
+} else if (params$response_var == "Sqrt.ON.Firing.Rate") {
+  spread_var <- "Log.ON.Firing.Rate"
+} else {
+  spread_var <- params$response_var
+}
+
+calculate_spread_measures <- function(values) {
+  values <- values[!is.na(values)]
+  if (length(values) < 2) {
+    return(data.frame(
+      n = length(values),
+      mean = NA, median = NA, sd = NA, iqr = NA, mad = NA, 
+      cv = NA, p90_p10 = NA, range = NA
+    ))
+  }
+  
+  mean_val <- mean(values)
+  data.frame(
+    n = length(values),
+    mean = mean_val,
+    median = median(values),
+    sd = sd(values),
+    iqr = IQR(values),
+    mad = mad(values),
+    cv = sd(values) / mean_val,
+    p90_p10 = quantile(values, 0.9) - quantile(values, 0.1),
+    range = diff(range(values))
+  )
+}
+
+# Calculate spread measures by condition
+spread_by_condition <- d %>%
+  group_by(condition) %>%
+  do(calculate_spread_measures(.[[params$response_var]])) %>%
+  ungroup()
+
+# Format for nice display
+spread_formatted <- spread_by_condition %>%
+  mutate(
+    across(c(mean, median, sd, iqr, mad, p90_p10, range), ~ round(.x, 4)),
+    cv = round(cv, 3)
+  )
+msg <- capture.output(
+  cat("Measures of spread by condition for", spread_var, ":\n"),
+  print(spread_formatted)
+)
+```
+
+```{r}
+#| include: false
+print(msg)
+```

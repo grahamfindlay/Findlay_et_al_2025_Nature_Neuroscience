@@ -1,0 +1,60 @@
+---
+params:
+  title: 'Slow-to-fast gamma ratio (Fig. 5C)'
+  fstem: Fig5C
+title: "`r params$title`"
+---
+```{r}
+#| include: false
+library(multcomp)
+library(devtools)
+devtools::load_all()
+
+dat <- load_sgfg_by_epoch_type()
+models <- fit_nested_models(
+    dat, "Slow.Fast.Gamma.Ratio", "Epoch.Type", "Experiment", "Subject"
+)
+```
+
+```{r}
+anova(models$full, models$reduced) # Test for interaction
+anova(models$reduced, models$null) # Test for overall effect
+```
+
+```{r}
+#| include: false
+effect_size <- subtract_ranef_get_fsquared(
+    dat,
+    models$reduced,
+    models$null
+)
+main_effect_effect_size_msg <- paste(
+    "Cohen's local f^2 analogue for main effect:",
+    format(round(effect_size$fsquared, 3), nsmall = 3)
+)
+```
+
+```{r}
+print(main_effect_effect_size_msg)
+```
+
+```{r}
+#| include: false
+# Post-hoc tests, confidence intervals, and effect sizes
+sgfg_contrast_matrix <- rbind(
+    "No-SPW Wake - SPW Wake" = c(0, 1, 0, 0, 0, 0),
+    "SPW NREM - SPW Wake" = c(0, 0, 1, 0, 0, 0),
+    "SPW NREM - No-SPW Wake" = c(0, -1, 1, 0, 0, 0)
+)
+
+ph <- list()
+ph$glht <- multcomp::glht(models$reduced, sgfg_contrast_matrix)
+ph$ci <- confint(ph$glht)
+ph$effect_size <- cohens_d_analogue(ph$glht, models$reduced)
+
+pst_msg <- format_posthoc_summary(ph)
+```
+
+```{r}
+cat(pst_msg, sep = "\n") # Post-hoc tests for condition differences
+```

@@ -1,0 +1,77 @@
+---
+params:
+  title: "EMG in Early vs Late Extended Wake"
+  fstem: RevFig999
+  response_variable: "EMG"
+title: "`r params$title`"
+---
+```{r}
+#| include: false
+#| eval: false
+params <- list()
+params$response_variable <- "EMG"
+```
+
+```{r}
+#| include: false
+library(devtools)
+library(here)
+devtools::load_all()
+
+result <- test_ewk_change(params$response_variable)
+
+# Check model fit and assumptions
+plot(result$models$full) # Plot model fit
+qqnorm(residuals(result$models$full)) # QQ plot of residuals
+qqline(residuals(result$models$full)) # Add QQ line
+
+sig_interaction <- result$interaction$pval < 0.05
+sig_main_effect <-
+    !sig_interaction && (result$main_effect$pval < 0.05)
+
+if (sig_interaction) {
+    interaction_effect_size_msg <- paste(
+        "Cohen's local f^2 analogue for interaction:",
+        format(round(result$interaction$effect_size$fsquared, 3), nsmall = 3)
+    )
+    nod_msg <- format_posthoc_summary(result$interaction$posthoc$nod)
+    cow_msg <- format_posthoc_summary(result$interaction$posthoc$cow)
+    ctn_msg <- format_posthoc_summary(result$interaction$posthoc$ctn)
+}
+
+if (sig_main_effect) {
+    main_effect_effect_size_msg <- paste(
+        "Cohen's local f^2 analogue for main effect:",
+        format(round(result$main_effect$effect_size$fsquared, 3), nsmall = 3)
+    )
+    pst_msg <- format_posthoc_summary(result$main_effect$posthoc)
+}
+```
+
+```{r}
+# Test for interaction between condition and experiment.
+print(result$interaction$anova)
+```
+
+```{r}
+#| eval: !expr 'sig_interaction'
+#| include: !expr 'sig_interaction'
+print(interaction_effect_size_msg)
+cat(nod_msg, sep = "\n") # Post-hoc tests for Novelty.
+cat(cow_msg, sep = "\n") # Post-hoc tests for Locomotion.
+cat(ctn_msg, sep = "\n") # Post-hoc tests for Dual.
+```
+
+```{r}
+#| eval: !expr '!sig_interaction'
+#| include: !expr '!sig_interaction'
+# Test for main effect of condition.
+print(result$main_effect$anova)
+```
+
+```{r}
+#| eval: !expr 'sig_main_effect'
+#| include: !expr 'sig_main_effect'
+print(main_effect_effect_size_msg)
+cat(pst_msg, sep = "\n") # Post-hoc tests in the absence of interaction.
+```

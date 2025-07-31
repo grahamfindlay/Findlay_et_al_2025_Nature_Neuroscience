@@ -1,0 +1,15 @@
+project:
+  type: default
+  execute-dir: file
+
+format:
+  pdf: 
+    fontsize: 8pt
+    include-in-header: compact-title.tex
+    pagestyle: empty
+    geometry: 
+      - top=0.5in
+      - bottom=0.5in
+      - left=0.5in
+      - right=0.5in
+      - heightrounded

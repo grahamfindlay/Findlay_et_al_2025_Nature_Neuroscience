@@ -1,0 +1,6 @@
+- title: 'Cortical spindle rate by state (Extended Data Fig. 7D)'
+  fstem: ExtFig7D1
+  response_variable: "Cortical.Spindle.Rate"
+- title: 'Dentate spike rate by state (Extended Data Fig. 7D)'
+  fstem: ExtFig7D2
+  response_variable: "DSPK.Rate"

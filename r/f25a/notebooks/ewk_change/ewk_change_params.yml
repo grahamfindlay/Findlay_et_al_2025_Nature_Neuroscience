@@ -1,0 +1,12 @@
+- title: "EMG in Early vs Late Extended Wake"
+  fstem: RevFig999
+  response_variable: "EMG"
+- title: "Hippocampal theta in Early vs Late Extended Wake"
+  fstem: RevFig999
+  response_variable: "Hippocampal.Theta"
+- title: "Hippocampal theta-delta ratio in Early vs Late Extended Wake"
+  fstem: RevFig999
+  response_variable: "Hippocampal.ThetaDeltaRatio"
+- title: "Cortical 2-6 Hz power in Early vs Late Extended Wake"
+  fstem: RevFig999
+  response_variable: "Cortical.Eta"

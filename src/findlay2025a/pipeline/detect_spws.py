@@ -5,8 +5,8 @@ import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 import xarray as xr
-from ecephys import wne, xrsig
 
+from ecephys import wne, xrsig
 from findlay2025a import core, sharp_waves
 from findlay2025a.constants import Experiments, Files
 
@@ -14,6 +14,7 @@ DISABLED_DRIFT: Final[list[tuple[str, Experiments]]] = [
     ("CNPIX6-Eugene", Experiments.NOD),
     ("CNPIX18-Pier", Experiments.COW),
     ("CNPIX19-Otto", Experiments.COW),
+    ("CNPIX20-Ernst", Experiments.CTN),  # Added 7/2/25
 ]
 
 

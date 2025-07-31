@@ -1,0 +1,966 @@
+---
+params:
+  title: "Cortical iDelta rebound vs. SPW rate rebound (Fig. 4C)"
+  fstem: Fig4C1
+  x_variable: "SPW.Rate.Rebound"
+  y_variable: "Cortical.iDelta.Rebound"
+  use_region_colors: TRUE
+title: "`r params$title`"
+---
+\pagenumbering{gobble}
+```{r}
+#| include: false
+#| eval: false
+params <- list()
+params$x_variable <- "SPW.Rate.Rebound"
+params$y_variable <- "Cortical.iDelta.Rebound"
+params$use_region_colors <- TRUE # TRUE: region colors + experiment shapes, FALSE: experiment colors + region shapes
+```
+
+```{r, include=FALSE}
+library(assertthat)
+library(dplyr)
+library(ggplot2)
+library(lme4)
+library(multcomp)
+library(modelbased)
+library(devtools)
+library(here)
+devtools::load_all()
+
+fig_dir <- here::here("_figures", "multiregion_condition_difference_correlation")
+
+# Define region colors
+region_colors <- c(
+    "MOT" = "#0173B2",
+    "VIS" = "#029E73",
+    "PPC" = "#D55E00",
+    "FRC" = "#CC78BC",
+    "PHR" = "#ECE133"
+)
+
+# Set up color and shape mapping based on parameter
+if (params$use_region_colors) {
+    point_colors <- region_colors
+    point_shapes <- experiment_shapes
+    color_var <- "region"
+    shape_var <- "experiment"
+    color_label <- "Region"
+    shape_label <- "Experiment"
+} else {
+    point_colors <- experiment_colors
+    point_shapes <- c("MOT" = 18, "VIS" = 17, "PPC" = 16, "FRC" = 15, "PHR" = 8)
+    color_var <- "experiment"
+    shape_var <- "region"
+    color_label <- "Experiment"
+    shape_label <- "Region"
+}
+
+# Test contrast correlation
+r <- list()
+r$data <- load_condition_differences(rev = TRUE)
+r$data <- r$data[!is.na(r$data[[params$x_variable]]), ]
+
+# Fit nested models
+response_var <- params$y_variable
+primary_covariate <- params$x_variable
+secondary_covariate <- "experiment"
+tertiary_covariate <- "region"
+random_factor <- "subject"
+
+random_intercept <- paste0("(1 | ", random_factor, ")")
+
+f1 <- reformulate(
+    c(
+        paste(
+            primary_covariate,
+            "*",
+            secondary_covariate,
+            "*",
+            tertiary_covariate
+        ),
+        random_intercept
+    ),
+    response = response_var
+) # Full model
+
+f2 <- reformulate(
+    c(
+        paste(
+            primary_covariate,
+            "*",
+            secondary_covariate,
+            "*",
+            tertiary_covariate,
+            "-",
+            primary_covariate,
+            ":",
+            secondary_covariate,
+            ":",
+            tertiary_covariate
+        ),
+        random_intercept
+    ),
+    response = response_var
+) # Reduced model
+
+full <- lme4::lmer(f1, data = r$data, REML = FALSE)
+minus_pst <- lme4::lmer(f2, data = r$data, REML = FALSE)
+
+plot(full)
+qqnorm(residuals(full))
+qqline(residuals(full))
+
+three_way <- test_interaction(
+    r$data, list(full = full, reduced = minus_pst),
+    make_three_way_contrasts(
+        full,
+        primary_var = primary_covariate,
+        secondary_var = secondary_covariate,
+        tertiary_var = tertiary_covariate
+    )
+)
+sig_three_way <- three_way$pval <= 0.05
+
+if (sig_three_way) {
+    three_way_effect_size_msg <- paste(
+        "Cohen's local f^2 analogue for three-way interaction:",
+        format(round(three_way$effect_size$fsquared, 3), nsmall = 3)
+    )
+    three_way_posthoc_msg <- format_posthoc_summary(three_way$posthoc)
+} else {
+    two_ways <- test_two_ways(
+        full_minus_pst = minus_pst,
+        primary_covariate = primary_covariate,
+        secondary_covariate = secondary_covariate,
+        tertiary_covariate = tertiary_covariate,
+        response_var = response_var,
+        random_intercept = random_intercept
+    )
+    sig_ps <- (two_ways$minus_ps$pval <= 0.05)
+    sig_pt <- (two_ways$minus_pt$pval <= 0.05)
+    sig_st <- (two_ways$minus_st$pval <= 0.05)
+    if (sig_ps) {
+        ps_effect_size_msg <- paste(
+            "Cohen's local f^2 analogue for covariate:experiment interaction:",
+            format(round(two_ways$minus_ps$effect_size$fsquared, 3), nsmall = 3)
+        )
+    } else {
+        ps_effect_size_msg <- paste(
+            "Cohen's local f^2 analogue for covariate:experiment interaction:",
+            "N/A (No significant interaction)."
+        )
+    }
+    if (sig_pt) {
+        pt_effect_size_msg <- paste(
+            "Cohen's local f^2 analogue for covariate:region interaction:",
+            format(round(two_ways$minus_pt$effect_size$fsquared, 3), nsmall = 3)
+        )
+    } else {
+        pt_effect_size_msg <- paste(
+            "Cohen's local f^2 analogue for covariate:region interaction:",
+            "N/A (No significant interaction)."
+        )
+    }
+    if (sig_st) {
+        st_effect_size_msg <- paste(
+            "Cohen's local f^2 analogue for experiment:region interaction:",
+            format(round(two_ways$minus_st$effect_size$fsquared, 3), nsmall = 3)
+        )
+    } else {
+        st_effect_size_msg <- paste(
+            "Cohen's local f^2 analogue for experiment:region interaction:",
+            "N/A (No significant interaction)."
+        )
+    }
+}
+
+sig_ps_only <- !sig_three_way && sig_ps && !sig_pt && !sig_st
+sig_pt_only <- !sig_three_way && sig_pt && !sig_ps && !sig_st
+sig_st_only <- !sig_three_way && sig_st && !sig_pt && !sig_ps
+sig_ps_pt <- !sig_three_way && sig_ps && sig_pt && !sig_st
+sig_ps_st <- !sig_three_way && sig_ps && !sig_pt && sig_st
+sig_pt_st <- !sig_three_way && !sig_ps && sig_pt && sig_st
+single_two_way <- sig_ps_only || sig_pt_only || sig_st_only
+double_two_way <- sig_ps_pt || sig_ps_st || sig_pt_st
+single_or_double_two_way <- single_two_way || double_two_way
+all_two_ways <- !sig_three_way && sig_ps && sig_pt && sig_st
+no_two_ways <- !sig_three_way && !sig_ps && !sig_pt && !sig_st
+
+if (all_two_ways) {
+    k <- make_three_way_contrasts(
+        full,
+        primary_var = primary_covariate,
+        secondary_var = secondary_covariate,
+        tertiary_var = tertiary_covariate
+    )
+    two_ways_posthoc <- multcomp::glht(full, linfct = k)
+}
+```
+
+```{r}
+print(three_way$anova)
+```
+
+```{r}
+#| eval: !expr 'sig_three_way'
+#| include: !expr 'sig_three_way'
+print(three_way_effect_size_msg)
+cat(three_way_posthoc_msg, sep = "\n")
+```
+
+```{r}
+#| eval: !expr 'sig_three_way'
+#| include: false
+# Plot the three-way interaction
+three_way_predictions <- estimate_expectation(
+    full,
+    by = c(primary_covariate, secondary_covariate, tertiary_covariate),
+    length = 100
+)
+
+# Get slopes for each experiment-region combination
+three_way_slopes <- estimate_slopes(
+    full,
+    trend = primary_covariate,
+    by = c(secondary_covariate, tertiary_covariate)
+)
+
+# Determine which experiment-region combinations have significant slopes (p < 0.05)
+significant_combinations <- three_way_slopes %>%
+    filter(p < 0.05) %>%
+    dplyr::select(all_of(c(secondary_covariate, tertiary_covariate)))
+
+# Filter predictions to only significant experiment-region combinations
+if (nrow(significant_combinations) > 0) {
+    sig_three_way_predictions <- three_way_predictions %>%
+        inner_join(
+            significant_combinations,
+            by = c(secondary_covariate, tertiary_covariate)
+        )
+} else {
+    sig_three_way_predictions <- three_way_predictions[0, ] # Empty data frame
+}
+
+if (params$use_region_colors) {
+    # When using region colors, color three-way lines by region
+    p <- ggplot(
+        sig_three_way_predictions,
+        aes(x = get(primary_covariate), y = Predicted)
+    )
+
+    # Add ribbons and lines for each significant experiment-region combination
+    if (nrow(significant_combinations) > 0) {
+        for (i in 1:nrow(significant_combinations)) {
+            exp <- significant_combinations[i, secondary_covariate]
+            reg <- significant_combinations[i, tertiary_covariate]
+
+            combo_data <- sig_three_way_predictions[
+                sig_three_way_predictions[[secondary_covariate]] == exp &
+                    sig_three_way_predictions[[tertiary_covariate]] == reg,
+            ]
+
+            region_color <- region_colors[[as.character(reg)]]
+
+            p <- p +
+                geom_ribbon(
+                    data = combo_data,
+                    aes(ymin = CI_low, ymax = CI_high),
+                    fill = region_color,
+                    alpha = 0.1,
+                    color = NA
+                ) +
+                geom_line(
+                    data = combo_data,
+                    color = region_color,
+                    linewidth = 1.2
+                )
+        }
+    }
+
+    # Use region colors for points
+    p <- p +
+        scale_color_manual(values = point_colors) +
+        scale_shape_manual(values = point_shapes)
+} else {
+    # Original behavior with purple lines
+    p <- ggplot(
+        sig_three_way_predictions,
+        aes(
+            x = get(primary_covariate),
+            y = Predicted
+        )
+    ) +
+        geom_ribbon(
+            aes(
+                ymin = CI_low,
+                ymax = CI_high,
+                group = interaction(
+                    get(secondary_covariate),
+                    get(tertiary_covariate)
+                )
+            ),
+            alpha = 0.1,
+            fill = "purple"
+        ) +
+        geom_line(
+            aes(
+                group = interaction(
+                    get(secondary_covariate),
+                    get(tertiary_covariate)
+                )
+            ),
+            color = "purple",
+            linewidth = 1.2
+        ) +
+        scale_color_manual(values = point_colors) +
+        scale_shape_manual(values = point_shapes)
+}
+
+# Add points and common elements
+p <- p +
+    geom_point(
+        data = r$data,
+        aes(
+            x = get(primary_covariate),
+            y = get(response_var),
+            color = get(color_var),
+            shape = get(shape_var)
+        ),
+        size = 5,
+        inherit.aes = FALSE
+    ) +
+    labs(
+        x = primary_covariate,
+        y = response_var,
+        color = color_label,
+        shape = shape_label
+    ) +
+    theme_classic() +
+    theme(legend.position = "none", aspect.ratio = 1)
+print(p)
+
+# Create version without axis labels or tick labels for saving
+p_clean <- p +
+    theme(
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank()
+    )
+plotname <- paste0(response_var, "_vs_", primary_covariate, ".png")
+plotpath <- file.path(fig_dir, plotname)
+ggsave(
+    plotpath,
+    p_clean,
+    bg = "white",
+    width = 5,
+    height = 5,
+    create.dir = TRUE
+)
+```
+
+```{r}
+#| eval: !expr '!sig_three_way'
+#| include: !expr '!sig_three_way'
+print(two_ways$minus_ps$anova)
+print(ps_effect_size_msg)
+
+print(two_ways$minus_pt$anova)
+print(pt_effect_size_msg)
+
+print(two_ways$minus_st$anova)
+print(st_effect_size_msg)
+```
+
+
+```{r}
+#| eval: !expr 'sig_ps_only'
+#| include: false
+
+simplified_model <- reformulate(
+    c(
+        paste(
+            primary_covariate,
+            "*",
+            secondary_covariate,
+            "+",
+            tertiary_covariate
+        ),
+        random_intercept
+    ),
+    response = response_var
+)
+simplified_model <- lme4::lmer(simplified_model, data = r$data, REML = FALSE)
+k <- make_two_way_contrasts(
+    simplified_model,
+    primary_var = primary_covariate,
+    secondary_var = secondary_covariate
+)
+ph <- list()
+ph$glht <- multcomp::glht(simplified_model, linfct = k)
+ph$ci <- stats::confint(ph$glht)
+ph$effect_size <- cohens_d_analogue(ph$glht, simplified_model)
+posthoc_msg <- format_posthoc_summary(ph)
+```
+
+```{r}
+#| eval: !expr 'sig_ps_only'
+#| include: !expr 'sig_ps_only'
+cat(posthoc_msg, sep = "\n")
+```
+
+```{r}
+#| eval: !expr 'sig_ps_only'
+#| include: false
+# Get predictions for the interaction
+interaction_predictions <- estimate_expectation(
+    simplified_model,
+    by = c(primary_covariate, secondary_covariate),
+    length = 100
+)
+
+# Determine which experiments have significant or trending slopes
+posthoc_summary <- summary(ph$glht)
+posthoc_pvals <- posthoc_summary$test$pvalues
+
+# Include experiments with p < 0.1 (both significant and trending)
+relevant_experiments <- levels(r$data$experiment)[
+    which(posthoc_pvals < 0.1)
+]
+
+# Create a mapping of experiment to line type
+experiment_linetypes <- ifelse(
+    posthoc_pvals < 0.05,
+    "solid",
+    "dashed"
+)
+names(experiment_linetypes) <- levels(r$data$experiment)
+
+# Only plot if there are relevant experiments
+if (length(relevant_experiments) > 0) {
+    # Filter predictions to only significant and trending experiments
+    sig_predictions <- interaction_predictions %>%
+        filter(get(secondary_covariate) %in% relevant_experiments) %>%
+        mutate(
+            linetype = experiment_linetypes[as.character(get(
+                secondary_covariate
+            ))]
+        )
+
+    # Plot significant and trending slopes
+    if (params$use_region_colors) {
+        # When using region colors, manually color lines and create combined scale
+        p <- ggplot(
+            sig_predictions,
+            aes(x = get(primary_covariate), y = Predicted)
+        )
+
+        # Add ribbons and lines for each experiment manually
+        for (exp in relevant_experiments) {
+            exp_data <- sig_predictions[
+                sig_predictions[[secondary_covariate]] == exp,
+            ]
+            exp_color <- experiment_colors[[exp]]
+            exp_linetype <- unique(exp_data$linetype)
+
+            p <- p +
+                geom_ribbon(
+                    data = exp_data,
+                    aes(ymin = CI_low, ymax = CI_high),
+                    fill = exp_color,
+                    alpha = 0.2,
+                    color = NA
+                ) +
+                geom_line(
+                    data = exp_data,
+                    color = exp_color,
+                    linetype = exp_linetype,
+                    linewidth = 1.2
+                )
+        }
+
+        # Use region colors for points
+        p <- p +
+            scale_color_manual(values = point_colors) +
+            scale_shape_manual(values = point_shapes)
+    } else {
+        # Original behavior with experiment colors for lines
+        p <-
+            ggplot(
+                sig_predictions,
+                aes(
+                    x = get(primary_covariate),
+                    y = Predicted,
+                    color = get(secondary_covariate),
+                    linetype = linetype
+                )
+            ) +
+            geom_ribbon(
+                aes(
+                    ymin = CI_low,
+                    ymax = CI_high,
+                    fill = get(secondary_covariate)
+                ),
+                alpha = 0.2,
+                color = NA
+            ) +
+            geom_line(linewidth = 1.2) +
+            scale_linetype_identity() +
+            scale_color_manual(values = experiment_colors) +
+            scale_fill_manual(values = experiment_colors) +
+            scale_shape_manual(values = point_shapes)
+    }
+} else {
+    # No relevant experiments - plot without lines
+    p <-
+        ggplot(
+            r$data,
+            aes(
+                x = get(primary_covariate),
+                y = get(response_var)
+            )
+        ) +
+        scale_color_manual(values = point_colors) +
+        scale_shape_manual(values = point_shapes)
+}
+
+# Add points and common elements
+p <- p +
+    geom_point(
+        data = r$data,
+        aes(
+            x = get(primary_covariate),
+            y = get(response_var),
+            color = get(color_var),
+            shape = get(shape_var)
+        ),
+        size = 5,
+        inherit.aes = FALSE
+    ) +
+    labs(
+        x = primary_covariate,
+        y = response_var,
+        color = color_label,
+        shape = shape_label
+    ) +
+    theme_classic() +
+    theme(legend.position = "none", aspect.ratio = 1)
+print(p)
+
+# Create version without axis labels or tick labels for saving
+p_clean <- p +
+    theme(
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank()
+    )
+plotname <- paste0(response_var, "_vs_", primary_covariate, ".png")
+plotpath <- file.path(fig_dir, plotname)
+ggsave(
+    plotpath,
+    p_clean,
+    bg = "white",
+    width = 5,
+    height = 5,
+    create.dir = TRUE
+)
+```
+
+```{r}
+#| eval: !expr 'sig_ps_st'
+#| include: false
+simplified_model <- reformulate(
+    c(
+        paste(
+            primary_covariate,
+            "*",
+            secondary_covariate,
+            "+",
+            secondary_covariate,
+            "*",
+            tertiary_covariate
+        ),
+        random_intercept
+    ),
+    response = response_var
+)
+simplified_model <- lme4::lmer(simplified_model, data = r$data, REML = FALSE)
+k <- make_two_way_contrasts(
+    simplified_model,
+    primary_var = primary_covariate,
+    secondary_var = secondary_covariate
+)
+ph <- list()
+ph$glht <- multcomp::glht(simplified_model, linfct = k)
+ph$ci <- confint(ph$glht)
+ph$effect_size <- cohens_d_analogue(ph$glht, simplified_model)
+posthoc_msg <- format_posthoc_summary(ph)
+```
+
+```{r}
+#| eval: !expr 'sig_ps_st'
+#| include: !expr 'sig_ps_st'
+cat(posthoc_msg, sep = "\n")
+```
+
+```{r}
+#| eval: !expr 'sig_ps_st'
+#| include: false
+# Get predictions for the interaction
+interaction_predictions <- estimate_expectation(
+    simplified_model,
+    by = c(primary_covariate, secondary_covariate),
+    length = 100
+)
+
+# Determine which experiments have significant or trending slopes
+posthoc_summary <- summary(ph$glht)
+posthoc_pvals <- posthoc_summary$test$pvalues
+
+# Include experiments with p < 0.1 (both significant and trending)
+relevant_experiments <- levels(r$data$experiment)[
+    which(posthoc_pvals < 0.1)
+]
+
+# Create a mapping of experiment to line type
+experiment_linetypes <- ifelse(
+    posthoc_pvals < 0.05,
+    "solid",
+    "dashed"
+)
+names(experiment_linetypes) <- levels(r$data$experiment)
+
+# Only plot if there are relevant experiments
+if (length(relevant_experiments) > 0) {
+    # Filter predictions to only significant and trending experiments
+    sig_predictions <- interaction_predictions %>%
+        filter(get(secondary_covariate) %in% relevant_experiments) %>%
+        mutate(
+            linetype = experiment_linetypes[as.character(get(
+                secondary_covariate
+            ))]
+        )
+
+    # Plot significant and trending slopes
+    if (params$use_region_colors) {
+        # When using region colors, manually color lines and create combined scale
+        p <- ggplot(
+            sig_predictions,
+            aes(x = get(primary_covariate), y = Predicted)
+        )
+
+        # Add ribbons and lines for each experiment manually
+        for (exp in relevant_experiments) {
+            exp_data <- sig_predictions[
+                sig_predictions[[secondary_covariate]] == exp,
+            ]
+            exp_color <- experiment_colors[[exp]]
+            exp_linetype <- unique(exp_data$linetype)
+
+            p <- p +
+                geom_ribbon(
+                    data = exp_data,
+                    aes(ymin = CI_low, ymax = CI_high),
+                    fill = exp_color,
+                    alpha = 0.2,
+                    color = NA
+                ) +
+                geom_line(
+                    data = exp_data,
+                    color = exp_color,
+                    linetype = exp_linetype,
+                    linewidth = 1.2
+                )
+        }
+
+        # Use region colors for points
+        p <- p +
+            scale_color_manual(values = point_colors) +
+            scale_shape_manual(values = point_shapes)
+    } else {
+        # Original behavior with experiment colors for lines
+        p <-
+            ggplot(
+                sig_predictions,
+                aes(
+                    x = get(primary_covariate),
+                    y = Predicted,
+                    color = get(secondary_covariate),
+                    linetype = linetype
+                )
+            ) +
+            geom_ribbon(
+                aes(
+                    ymin = CI_low,
+                    ymax = CI_high,
+                    fill = get(secondary_covariate)
+                ),
+                alpha = 0.2,
+                color = NA
+            ) +
+            geom_line(linewidth = 1.2) +
+            scale_linetype_identity() +
+            scale_color_manual(values = experiment_colors) +
+            scale_fill_manual(values = experiment_colors) +
+            scale_shape_manual(values = point_shapes)
+    }
+} else {
+    # No relevant experiments - plot without lines
+    p <-
+        ggplot(
+            r$data,
+            aes(
+                x = get(primary_covariate),
+                y = get(response_var)
+            )
+        ) +
+        scale_color_manual(values = point_colors) +
+        scale_shape_manual(values = point_shapes)
+}
+
+# Add points and common elements
+p <- p +
+    geom_point(
+        data = r$data,
+        aes(
+            x = get(primary_covariate),
+            y = get(response_var),
+            color = get(color_var),
+            shape = get(shape_var)
+        ),
+        size = 5,
+        inherit.aes = FALSE
+    ) +
+    labs(
+        x = primary_covariate,
+        y = response_var,
+        color = color_label,
+        shape = shape_label
+    ) +
+    theme_classic() +
+    theme(legend.position = "none", aspect.ratio = 1)
+print(p)
+
+# Create version without axis labels or tick labels for saving
+p_clean <- p +
+    theme(
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank()
+    )
+plotname <- paste0(response_var, "_vs_", primary_covariate, ".png")
+plotpath <- file.path(fig_dir, plotname)
+ggsave(
+    plotpath,
+    p_clean,
+    bg = "white",
+    width = 5,
+    height = 5,
+    create.dir = TRUE
+)
+```
+
+```{r}
+#| eval: !expr 'sig_st_only'
+#| include: false
+simplified_model <- reformulate(
+    c(
+        paste(
+            primary_covariate,
+            "+",
+            secondary_covariate,
+            "*",
+            tertiary_covariate
+        ),
+        random_intercept
+    ),
+    response = response_var
+)
+reduced_model <- reformulate(
+    c(
+        paste(
+            secondary_covariate,
+            "*",
+            tertiary_covariate
+        ),
+        random_intercept
+    ),
+    response = response_var
+)
+
+simplified_model <- lme4::lmer(simplified_model, data = r$data, REML = FALSE)
+reduced_model <- lme4::lmer(reduced_model, data = r$data, REML = FALSE)
+
+main_effect <- test_main_effect(r$data, list(reduced = simplified_model, null = reduced_model))
+```
+
+```{r}
+#| eval: !expr 'no_two_ways'
+#| include: false
+simplified_model <- reformulate(
+    c(
+        paste(
+            primary_covariate,
+            "+",
+            secondary_covariate,
+            "+",
+            tertiary_covariate
+        ),
+        random_intercept
+    ),
+    response = response_var
+)
+reduced_model <- reformulate(
+    c(
+        paste(
+            secondary_covariate,
+            "+",
+            tertiary_covariate
+        ),
+        random_intercept
+    ),
+    response = response_var
+)
+
+simplified_model <- lme4::lmer(simplified_model, data = r$data, REML = FALSE)
+reduced_model <- lme4::lmer(reduced_model, data = r$data, REML = FALSE)
+
+main_effect <- test_main_effect(r$data, list(reduced = simplified_model, null = reduced_model))
+```
+
+```{r}
+#| include: false
+main_effect_test_required <- !sig_three_way && !all_two_ways && (sig_st_only || no_two_ways)
+if (main_effect_test_required) {
+    sig_main_effect <- main_effect$pval <= 0.05
+    if (sig_main_effect) {
+        main_effect_effect_size_msg <- paste(
+            "Cohen's local f^2 analogue for main effect:",
+            format(round(main_effect$effect_size$fsquared, 3), nsmall = 3)
+        )
+    } else {
+        main_effect_effect_size_msg <- paste(
+            "Cohen's local f^2 analogue for main effect:",
+            "N/A (No significant main effect)."
+        )
+    }
+}
+```
+
+```{r}
+#| eval: !expr 'main_effect_test_required'
+#| include: !expr 'main_effect_test_required'
+print(main_effect$anova)
+cat(main_effect_effect_size_msg, sep = "\n")
+```
+
+
+```{r}
+#| eval: !expr 'main_effect_test_required && sig_main_effect'
+#| include: false
+main_effect_predictions <- estimate_expectation(
+    simplified_model,
+    by = primary_covariate,
+    length = 100
+)
+
+p <- ggplot(
+    main_effect_predictions,
+    aes(
+        x = get(primary_covariate),
+        y = Predicted
+    )
+) +
+    geom_ribbon(
+        aes(
+            ymin = CI_low,
+            ymax = CI_high,
+        ),
+        alpha = 0.2
+    ) +
+    geom_line(linewidth = 1.2) +
+    geom_point(
+        data = r$data,
+        aes(
+            x = get(primary_covariate),
+            y = get(response_var),
+            color = get(color_var),
+            shape = get(shape_var)
+        ),
+        size = 5,
+        inherit.aes = FALSE
+    ) +
+    scale_color_manual(values = point_colors) +
+    scale_shape_manual(values = point_shapes) +
+    labs(
+        x = primary_covariate,
+        y = response_var,
+        color = color_label,
+        shape = shape_label
+    ) +
+    theme_classic() +
+    theme(legend.position = "none", aspect.ratio = 1)
+print(p)
+
+# Create version without axis labels or tick labels for saving
+p_clean <- p +
+    theme(
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank()
+    )
+plotname <- paste0(response_var, "_vs_", primary_covariate, ".png")
+plotpath <- file.path(fig_dir, plotname)
+ggsave(
+    plotpath,
+    p_clean,
+    bg = "white",
+    width = 5,
+    height = 5,
+    create.dir = TRUE
+)
+```
+
+```{r}
+#| eval: !expr 'main_effect_test_required && !sig_main_effect'
+#| include: false
+p <- ggplot(
+    r$data,
+    aes(
+        x = get(primary_covariate),
+        y = get(response_var),
+        color = get(color_var),
+        shape = get(shape_var)
+    )
+) +
+    geom_point(size = 5) +
+    scale_color_manual(values = point_colors) +
+    scale_shape_manual(values = point_shapes) +
+    labs(
+        x = primary_covariate,
+        y = response_var,
+        color = color_label,
+        shape = shape_label
+    ) +
+    theme_classic() +
+    theme(legend.position = "none", aspect.ratio = 1)
+print(p)
+
+# Create version without axis labels or tick labels for saving
+p_clean <- p +
+    theme(
+        axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank()
+    )
+plotname <- paste0(response_var, "_vs_", primary_covariate, ".png")
+plotpath <- file.path(fig_dir, plotname)
+ggsave(
+    plotpath,
+    p_clean,
+    bg = "white",
+    width = 5,
+    height = 5,
+    create.dir = TRUE
+)
+```
