@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/935683351.svg)](https://doi.org/10.5281/zenodo.17364617)
+
 Code for Findlay et al., 2025, Nature Neuroscience.
 
 - To reproduce all figures, see `notebooks/figures/`.
