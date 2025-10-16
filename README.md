@@ -1,4 +1,4 @@
-Code for *Hippocampal sharp wave sleep: a unifying view of sleep in the hippocampus*.
+Code for Findlay et al., 2025, Nature Neuroscience.
 
 - To reproduce all figures, see `notebooks/figures/`.
 - To reproduce all statistical tables and supplements, see `r/`. 
